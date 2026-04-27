@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Umar | Creative Developer Portfolio</title>
+  <meta name="description" content="Umar's modern developer portfolio with projects, hire contact flow, and admin project management.">
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#home" aria-label="Umar portfolio home">
+      <span class="brand-mark">U</span>
+      <span>Umar</span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+      <span class="sr-only">Open navigation</span>
+      <span></span><span></span><span></span>
+    </button>
+    <nav id="site-nav" class="site-nav">
+      <a href="#work">Projects</a>
+      <a href="#skills">Skills</a>
+      <a href="#hire">Hire</a>
+      <a href="#admin">Admin</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home" class="hero">
+      <canvas id="hero-canvas" aria-hidden="true"></canvas>
+      <div class="hero-content reveal">
+        <p class="eyebrow">BEng (Hons) Software Engineering undergraduate</p>
+        <h1>Software Engineer turning ideas into <span class="gradient-text">powerful, business-ready digital experiences.</span></h1>
+        <p>I’m Umar, a full-stack web developer from Kandy, Sri Lanka, specializing in modern web development and crafting high-performance web applications and responsive websites that empower businesses to grow online.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#hire">Hire me</a>
+          <a class="button secondary" href="#work">View projects</a>
+          <a class="button cv-button" href="/cv" download>Download CV</a>
+        </div>
+      </div>
+      <div class="hero-card profile-card reveal" id="profile-card">
+        <div class="profile-orbit" aria-hidden="true"></div>
+        <div class="profile-frame">
+          <img src="/profile-image" alt="Umar profile photo">
+        </div>
+        <div class="profile-card-body">
+          <span>Available for work</span>
+          <strong>Umar</strong>
+          <small>BEng (Hons) Software Engineering</small>
+          <small>Full-stack web developer</small>
+          <div class="profile-chips" aria-label="Developer strengths">
+            <em>Web apps</em>
+            <em>Admin panels</em>
+            <em>3D UI</em>
+          </div>
+          <small>WhatsApp: +94 77 181 3023</small>
+          <small>umarxgamer04@gmail.com</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="metrics" aria-label="Portfolio highlights">
+      <div><span>Focus</span><strong>Web apps</strong></div>
+      <div><span>Admin</span><strong>CRUD panels</strong></div>
+      <div><span>Contact</span><strong>WhatsApp + Email</strong></div>
+      <div><span>Design</span><strong>Animation + 3D</strong></div>
+    </section>
+
+    <section id="about" class="section about-section">
+      <div class="about-panel reveal">
+        <p class="eyebrow">About me</p>
+        <h2>Software Engineering undergraduate with a strong passion for full-stack development and building real-world digital solutions.</h2>
+        <p>I am currently pursuing my BEng (Hons) in Software Engineering, building a solid foundation in modern technologies, system design, and professional software development practices.</p>
+        <p>I focus on creating user-centered websites and web applications, including e-commerce platforms, booking and ordering systems, and admin dashboards. My goal is to develop clean, scalable, and high-performance solutions that elevate business presence and drive meaningful customer engagement.</p>
+      </div>
+    </section>
+
+    <section id="work" class="section work-section">
+      <div class="section-heading reveal">
+        <div>
+          <p class="eyebrow">Selected work</p>
+          <h2>Past projects</h2>
+        </div>
+        <p class="section-note">These are seeded examples based on your recent work. You can edit, delete, or add projects from the admin panel.</p>
+      </div>
+      <div id="projects-grid" class="projects-grid"></div>
+    </section>
+
+    <section id="skills" class="section skills-section">
+      <div class="section-heading reveal">
+        <div>
+          <p class="eyebrow">Capabilities</p>
+          <h2>What I build</h2>
+        </div>
+      </div>
+      <div class="skills-grid">
+        <article class="skill-card reveal"><span>01</span><h3>Frontend design</h3><p>Responsive layouts, animations, landing pages, portfolios, and interactive UI.</p></article>
+        <article class="skill-card reveal"><span>02</span><h3>Backend systems</h3><p>Node APIs, auth, file-backed data, booking flows, reports, and admin actions.</p></article>
+        <article class="skill-card reveal"><span>03</span><h3>Business tools</h3><p>Ordering systems, WhatsApp handoff, email handoff, dashboards, and CRUD panels.</p></article>
+        <article class="skill-card reveal"><span>04</span><h3>3D effects</h3><p>Three.js hero scenes, animated particles, hover depth, and modern motion.</p></article>
+      </div>
+    </section>
+
+    <section id="hire" class="section hire-section">
+      <div class="hire-copy reveal">
+        <p class="eyebrow">Hire Umar</p>
+        <h2>Need a website, dashboard, or admin system?</h2>
+        <p>Send your project details. The request is saved in the admin panel, then you can send the same message through WhatsApp or email.</p>
+        <div class="direct-contact">
+          <a href="https://wa.me/94771813023" target="_blank" rel="noopener">WhatsApp: +94 77 181 3023</a>
+          <a href="mailto:umarxgamer04@gmail.com">umarxgamer04@gmail.com</a>
+          <a href="/cv" download>Download my CV</a>
+        </div>
+      </div>
+      <form id="hire-form" class="hire-form reveal">
+        <label>Name<input type="text" name="name" required></label>
+        <label>Company<input type="text" name="company" placeholder="Optional"></label>
+        <label>Email<input type="email" name="email" required></label>
+        <label>Phone / WhatsApp<input type="tel" name="phone" required></label>
+        <label>Budget<input type="text" name="budget" placeholder="Example: LKR 50,000"></label>
+        <label class="full">Project details<textarea name="message" rows="5" required placeholder="Tell me what you want to build"></textarea></label>
+        <button class="button primary" type="submit">Hire me</button>
+        <p class="form-status" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section id="admin" class="section admin-section">
+      <div class="section-heading reveal">
+        <div>
+          <p class="eyebrow">Private area</p>
+          <h2>Admin panel</h2>
+        </div>
+        <button id="logout-button" class="button secondary dark hidden" type="button">Logout</button>
+      </div>
+
+      <form id="login-form" class="login-form reveal">
+        <h3>Admin login</h3>
+        <label>Email<input type="email" name="email" required></label>
+        <label>Password<input type="password" name="password" required></label>
+        <button class="button primary" type="submit">Login</button>
+        <p class="form-status" role="status" aria-live="polite"></p>
+      </form>
+
+      <div id="admin-panel" class="admin-panel hidden">
+        <div id="report-cards" class="report-grid"></div>
+
+        <div class="admin-layout">
+          <form id="project-form" class="admin-form">
+            <h3>Create / update project</h3>
+            <input type="hidden" name="id">
+            <label>Title<input type="text" name="title" required></label>
+            <label>Category<input type="text" name="category" required></label>
+            <label>Year<input type="text" name="year" required></label>
+            <label class="full">Description<textarea name="description" rows="3" required></textarea></label>
+            <label class="full">Stack, comma separated<input type="text" name="stack" required></label>
+            <label class="full">Image URL<input type="url" name="imageUrl" required></label>
+            <label>Live URL<input type="text" name="liveUrl"></label>
+            <label>Source URL<input type="text" name="sourceUrl"></label>
+            <label class="checkbox-row"><input type="checkbox" name="featured"> Featured project</label>
+            <button class="button primary" type="submit">Save project</button>
+            <button id="clear-project-form" class="button secondary dark" type="button">Clear</button>
+            <p class="form-status" role="status" aria-live="polite"></p>
+          </form>
+
+          <section class="table-card">
+            <h3>Manage projects</h3>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Project</th><th>Stack</th><th>Action</th></tr></thead>
+                <tbody id="admin-projects-table"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+
+        <section class="table-card">
+          <h3>Hire requests</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Client</th><th>Message</th><th>Status</th><th>Contact</th></tr></thead>
+              <tbody id="hire-requests-table"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>Umar Portfolio</span>
+    <span>+94 77 181 3023 | umarxgamer04@gmail.com</span>
+  </footer>
+
+  <dialog id="hire-dialog">
+    <form method="dialog">
+      <h3>Hire request saved</h3>
+      <p id="hire-dialog-text"></p>
+      <div class="dialog-actions">
+        <a id="hire-whatsapp-link" class="button primary" href="#" target="_blank" rel="noopener">Send WhatsApp</a>
+        <a id="hire-email-link" class="button secondary dark" href="#">Send Email</a>
+        <button class="button secondary dark" type="submit">Close</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script async src="https://unpkg.com/es-module-shims@1.10.0/dist/es-module-shims.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.165.0/build/three.module.js"
+      }
+    }
+  </script>
+  <script type="module" src="script.js"></script>
+</body>
+</html>
