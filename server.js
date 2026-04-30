@@ -1,4 +1,4 @@
-const http = require("http");
+﻿const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
@@ -398,7 +398,59 @@ async function handleApi(req, res, pathname) {
     return json(res, 201, { request: withContactLinks(request) });
   }
 
-  if (req.method === "GET" && pathname === "/api/admin/dashboard") {
+  
+  if (req.method === "GET" && pathname === "/api/reviews") {
+    const db = readDb();
+    return json(res, 200, (db.reviews || []).filter(r => r.approved));
+  }
+
+  if (req.method === "POST" && pathname === "/api/reviews") {
+    const payload = await readBody(req);
+    const field = missing(payload, ["name", "rating", "message"]);
+    if (field) return error(res, 400, field + " is required");
+    const db = readDb();
+    if (!db.reviews) db.reviews = [];
+    const review = {
+      id: crypto.randomUUID(),
+      name: String(payload.name).trim(),
+      company: String(payload.company || "").trim(),
+      rating: parseInt(payload.rating) || 5,
+      message: String(payload.message).trim(),
+      approved: false,
+      createdAt: new Date().toISOString()
+    };
+    db.reviews.push(review);
+    writeDb(db);
+    return json(res, 201, { review });
+  }
+
+  if (req.method === "GET" && pathname === "/api/admin/reviews") {
+    if (!requireAdmin(req, res, db)) return;
+    const db = readDb();
+    return json(res, 200, { reviews: (db.reviews || []).reverse() });
+  }
+
+  const reviewMatch = pathname.match(/^\/(api\/admin\/reviews\/[^/]+)$/);
+  if (reviewMatch) {
+    if (!requireAdmin(req, res, db)) return;
+    const id = decodeURIComponent(req.url.split("/").pop());
+    const db = readDb();
+    const review = db.reviews.find(item => item.id === id);
+    if (!review) return error(res, 404, "Review not found");
+    if (req.method === "PUT") {
+      const payload = await readBody(req);
+      if (typeof payload.approved !== "undefined") review.approved = Boolean(payload.approved);
+      writeDb(db);
+      return json(res, 200, { review });
+    }
+    if (req.method === "DELETE") {
+      db.reviews = db.reviews.filter(item => item.id !== id);
+      writeDb(db);
+      return json(res, 200, { ok: true });
+    }
+  }
+
+   {
     if (!requireAdmin(req, res, db)) return;
     return json(res, 200, {
       reports: reports(db),

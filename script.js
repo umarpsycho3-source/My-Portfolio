@@ -388,3 +388,203 @@ async function init() {
 init().catch((error) => {
   projectsGrid.innerHTML = `<p>Could not load portfolio: ${escapeHtml(error.message)}</p>`;
 });
+
+// Package selection function
+window.selectPackage = function(package) {
+  const packageSelect = document.getElementById('package-select');
+  if (packageSelect) {
+    packageSelect.value = package;
+    packageSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+};
+
+// Star rating interaction
+document.addEventListener('DOMContentLoaded', function() {
+  const starLabels = document.querySelectorAll('.star-rating label');
+  starLabels.forEach((label, index) => {
+    label.addEventListener('click', function() {
+      const rating = 5 - index;
+      const radios = document.querySelectorAll('.star-rating input');
+      radios.forEach(r => r.checked = false);
+      radios[5 - rating].checked = true;
+      highlightStars(rating);
+    });
+  });
+});
+
+function highlightStars(rating) {
+  const labels = document.querySelectorAll('.star-rating label');
+  labels.forEach((label, index) => {
+    if (index < 6 - rating) {
+      label.style.color = '#f59e0b';
+    } else {
+      label.style.color = '#d1d5db';
+    }
+  });
+}
+
+// Reviews state
+let reviews = [];
+
+const reviewsGrid = document.getElementById('reviews-grid');
+const reviewForm = document.getElementById('review-form');
+const reviewDialog = document.getElementById('review-dialog');
+
+async function loadReviews() {
+  try {
+    reviews = await api('/api/reviews');
+    renderReviews();
+    updateReviewStats();
+  } catch (error) {
+    console.log('Could not load reviews');
+  }
+}
+
+function renderReviews() {
+  if (!reviewsGrid) return;
+  const approvedReviews = reviews.filter(r => r.approved);
+  if (approvedReviews.length === 0) {
+    reviewsGrid.innerHTML = '<p style="text-align:center; grid-column: 1/-1; color: var(--muted);">No reviews yet. Be the first to leave a review!</p>';
+    return;
+  }
+  reviewsGrid.innerHTML = approvedReviews.map(review => {
+    const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+    return `
+      <article class="review-card">
+        <div class="stars">${stars}</div>
+        <p>${escapeHtml(review.message)}</p>
+        <footer>
+          <div>
+            <strong>${escapeHtml(review.name)}</strong>
+            ${review.company ? `<small>${escapeHtml(review.company)}</small>` : ''}
+          </div>
+        </footer>
+      </article>
+    `;
+  }).join('');
+}
+
+function updateReviewStats() {
+  const approvedReviews = reviews.filter(r => r.approved);
+  const avgRating = approvedReviews.length > 0 
+    ? (approvedReviews.reduce((sum, r) => sum + r.rating, 0) / approvedReviews.length).toFixed(1) 
+    : '0.0';
+  
+  const avgRatingEl = document.getElementById('avg-rating');
+  const reviewTotalEl = document.getElementById('review-total');
+  const avgStarsEl = document.getElementById('avg-stars');
+  
+  if (avgRatingEl) avgRatingEl.textContent = avgRating;
+  if (reviewTotalEl) reviewTotalEl.textContent = approvedReviews.length;
+  if (avgStarsEl) avgStarsEl.textContent = '★'.repeat(Math.round(avgRating));
+}
+
+// Review form submission
+if (reviewForm) {
+  reviewForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const formData = new FormData(reviewForm);
+    const rating = formData.get('rating');
+    if (!rating) {
+      setStatus(reviewForm, 'Please select a rating', true);
+      return;
+    }
+    const payload = {
+      name: formData.get('name'),
+      company: formData.get('company'),
+      rating: parseInt(rating),
+      message: formData.get('message')
+    };
+    try {
+      await api('/api/reviews', { method: 'POST', body: JSON.stringify(payload) });
+      reviewForm.reset();
+      setStatus(reviewForm, 'Thank you! Your review has been submitted.');
+      if (reviewDialog) reviewDialog.showModal();
+    } catch (error) {
+      setStatus(reviewForm, error.message, true);
+    }
+  });
+}
+
+// Admin reviews management
+const adminReviewsTable = document.getElementById('admin-reviews-table');
+
+async function loadAdminReviews() {
+  try {
+    const data = await api('/api/admin/reviews');
+    renderAdminReviews(data.reviews);
+  } catch (error) {
+    console.log('Could not load admin reviews');
+  }
+}
+
+function renderAdminReviews(reviewList) {
+  if (!adminReviewsTable) return;
+  adminReviewsTable.innerHTML = reviewList && reviewList.length > 0
+    ? reviewList.map(review => {
+        const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+        return `
+          <tr>
+            <td>${escapeHtml(review.name)}${review.company ? `<br><small>${escapeHtml(review.company)}</small>` : ''}</td>
+            <td><span class="stars">${stars}</span></td>
+            <td>${escapeHtml(review.message)}</td>
+            <td>
+              <select class="status-select" data-review-status="${escapeHtml(review.id)}">
+                <option ${review.approved ? 'selected' : ''} value="true">Approved</option>
+                <option ${!review.approved ? 'selected' : ''} value="false">Pending</option>
+              </select>
+              <button class="button danger" type="button" data-delete-review="${escapeHtml(review.id)}">Delete</button>
+            </td>
+          </tr>
+        `;
+      }).join('')
+    : '<tr><td colspan="4">No reviews yet.</td></tr>';
+}
+
+// Review status change
+document.addEventListener('change', async (event) => {
+  const reviewStatusId = event.target.dataset.reviewStatus;
+  if (!reviewStatusId) return;
+  await api(`/api/admin/reviews/${reviewStatusId}`, {
+    method: 'PUT',
+    body: JSON.stringify({ approved: event.target.value === 'true' })
+  });
+  await loadAdminReviews();
+  await loadReviews();
+});
+
+// Review deletion
+document.addEventListener('click', async (event) => {
+  const deleteReviewId = event.target.dataset.deleteReview;
+  if (!deleteReviewId) return;
+  if (confirm('Delete this review?')) {
+    await api(`/api/admin/reviews/${deleteReviewId}`, { method: 'DELETE' });
+    await loadAdminReviews();
+    await loadReviews();
+  }
+});
+
+// Update loadMe to also load reviews
+const originalLoadMe = typeof loadMe === 'function' ? loadMe : null;
+
+async function loadMe() {
+  if (originalLoadMe) await originalLoadMe();
+  await loadReviews();
+}
+
+// Update loadAdmin to also load reviews
+const originalLoadAdmin = typeof loadAdmin === 'function' ? loadAdmin : null;
+
+async function loadAdmin() {
+  if (originalLoadAdmin) await originalLoadAdmin();
+  await loadAdminReviews();
+}
+
+// Init reviews on page load
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(loadReviews, 500);
+  });
+} else {
+  setTimeout(loadReviews, 500);
+}

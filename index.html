@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Umar | Creative Developer Portfolio</title>
-  <meta name="description" content="Umar's modern developer portfolio with projects, hire contact flow, and admin project management.">
+  <title>Umar | Full-Stack Developer</title>
+  <meta name="description" content="Umar - BEng Software Engineering student, Full-Stack Web Developer creating powerful digital experiences.">
   <link rel="preconnect" href="https://images.unsplash.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,9 +22,16 @@
       <span></span><span></span><span></span>
     </button>
     <nav id="site-nav" class="site-nav">
-      <a href="#work">Projects</a>
+      <a href="#about">About</a>
       <a href="#skills">Skills</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#work">Projects</a>
       <a href="#hire">Hire</a>
+      <a href="https://linkedin.com/in/yourprofile" target="_blank" rel="noopener" class="linkedin-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        LinkedIn
+      </a>
       <a href="#admin">Admin</a>
     </nav>
   </header>
@@ -33,9 +40,9 @@
     <section id="home" class="hero">
       <canvas id="hero-canvas" aria-hidden="true"></canvas>
       <div class="hero-content reveal">
-        <p class="eyebrow">BEng (Hons) Software Engineering undergraduate</p>
-        <h1>Software Engineer turning ideas into <span class="gradient-text">powerful, business-ready digital experiences.</span></h1>
-        <p>I’m Umar, a full-stack web developer from Kandy, Sri Lanka, specializing in modern web development and crafting high-performance web applications and responsive websites that empower businesses to grow online.</p>
+        <p class="eyebrow">BEng Software Engineering - Full-Stack Developer</p>
+        <h1>I Build <span class="gradient-text">Web Experiences</span> That Work</h1>
+        <p>Full-stack developer crafting high-performance websites, web apps, and admin dashboards. From concept to deployment - I handle it all.</p>
         <div class="hero-actions">
           <a class="button primary" href="#hire">Hire me</a>
           <a class="button secondary" href="#work">View projects</a>
@@ -48,7 +55,7 @@
           <img src="/profile-image" alt="Umar profile photo">
         </div>
         <div class="profile-card-body">
-          <span>Available for work</span>
+          <span class="available-badge">Available for work</span>
           <strong>Umar</strong>
           <small>BEng (Hons) Software Engineering</small>
           <small>Full-stack web developer</small>
@@ -64,26 +71,79 @@
     </section>
 
     <section class="metrics" aria-label="Portfolio highlights">
-      <div><span>Focus</span><strong>Web apps</strong></div>
-      <div><span>Admin</span><strong>CRUD panels</strong></div>
-      <div><span>Contact</span><strong>WhatsApp + Email</strong></div>
+      <div><span>Focus</span><strong>Full-Stack</strong></div>
+      <div><span>Projects</span><strong>8+</strong></div>
+      <div><span>Location</span><strong>Kandy, Sri Lanka</strong></div>
       <div><span>Design</span><strong>Animation + 3D</strong></div>
     </section>
 
     <section id="about" class="section about-section">
       <div class="about-panel reveal">
-        <p class="eyebrow">About me</p>
-        <h2>Software Engineering undergraduate with a strong passion for full-stack development and building real-world digital solutions.</h2>
-        <p>I am currently pursuing my BEng (Hons) in Software Engineering, building a solid foundation in modern technologies, system design, and professional software development practices.</p>
-        <p>I focus on creating user-centered websites and web applications, including e-commerce platforms, booking and ordering systems, and admin dashboards. My goal is to develop clean, scalable, and high-performance solutions that elevate business presence and drive meaningful customer engagement.</p>
+        <p class="eyebrow">About Me</p>
+        <h2>Who I Am</h2>
+        <p>Pursuing BEng (Hons) Software Engineering. I build full-stack web applications, responsive websites, and admin dashboards that help businesses grow online.</p>
+        <div class="about-stats">
+          <div class="about-stat">
+            <strong>Frontend</strong>
+            <span>React, Vue, HTML/CSS</span>
+          </div>
+          <div class="about-stat">
+            <strong>Backend</strong>
+            <span>Node.js, Express, MongoDB</span>
+          </div>
+          <div class="about-stat">
+            <strong>Design</strong>
+            <span>UI/UX, Responsive, 3D</span>
+          </div>
+        </div>
       </div>
     </section>
 
+    <section id="why" class="section why-section">
+      <div class="section-heading reveal">
+        <div>
+          <p class="eyebrow">Why Work With Me</p>
+          <h2>Why Choose Me?</h2>
+        </div>
+      </div>
+      <div class="why-grid">
+        <article class="why-card reveal">
+          <span class="why-icon">R</span>
+          <h3>Fast Delivery</h3>
+          <p>Quick turnaround without compromising quality. Your project delivered on time, every time.</p>
+        </article>
+        <article class="why-card reveal">
+          <span class="why-icon">M</span>
+          <h3>Modern Tech Stack</h3>
+          <p>I use the latest technologies to build scalable, maintainable, and high-performance solutions.</p>
+        </article>
+        <article class="why-card reveal">
+          <span class="why-icon">D</span>
+          <h3>Clean Design</h3>
+          <p>Pixel-perfect UI with attention to detail. Every project looks professional and polished.</p>
+        </article>
+        <article class="why-card reveal">
+          <span class="why-icon">S</span>
+          <h3>Full Support</h3>
+          <p>Ongoing maintenance and support. I stay with you even after project completion.</p>
+        </article>
+        <article class="why-card reveal">
+          <span class="why-icon">P</span>
+          <h3>Fair Pricing</h3>
+          <p>Competitive rates with transparent pricing. No hidden costs or surprises.</p>
+        </article>
+        <article class="why-card reveal">
+          <span class="why-icon">R</span>
+          <h3>Fully Responsive</h3>
+          <p>Works perfectly on all devices - desktop, tablet, and mobile.</p>
+        </article>
+      </div>
+    </section>
     <section id="work" class="section work-section">
       <div class="section-heading reveal">
         <div>
           <p class="eyebrow">Selected work</p>
-          <h2>Past projects</h2>
+          <h2>Past Projects</h2>
         </div>
         <p class="section-note">These are seeded examples based on your recent work. You can edit, delete, or add projects from the admin panel.</p>
       </div>
@@ -94,22 +154,123 @@
       <div class="section-heading reveal">
         <div>
           <p class="eyebrow">Capabilities</p>
-          <h2>What I build</h2>
+          <h2>Skills and Tools</h2>
         </div>
       </div>
       <div class="skills-grid">
-        <article class="skill-card reveal"><span>01</span><h3>Frontend design</h3><p>Responsive layouts, animations, landing pages, portfolios, and interactive UI.</p></article>
-        <article class="skill-card reveal"><span>02</span><h3>Backend systems</h3><p>Node APIs, auth, file-backed data, booking flows, reports, and admin actions.</p></article>
-        <article class="skill-card reveal"><span>03</span><h3>Business tools</h3><p>Ordering systems, WhatsApp handoff, email handoff, dashboards, and CRUD panels.</p></article>
-        <article class="skill-card reveal"><span>04</span><h3>3D effects</h3><p>Three.js hero scenes, animated particles, hover depth, and modern motion.</p></article>
+        <article class="skill-card reveal"><span>01</span><h3>Frontend Development</h3><p>HTML5, CSS3, JavaScript (ES6+), React.js, Vue.js, TypeScript, Tailwind CSS, Bootstrap, Responsive Design, UI/UX Fundamentals</p></article>
+        <article class="skill-card reveal"><span>02</span><h3>Backend Development</h3><p>Node.js, Express.js, MongoDB, SQL, REST APIs, Authentication, JWT, Security Best Practices, Performance Optimization</p></article>
+        <article class="skill-card reveal"><span>03</span><h3>Design and Creative</h3><p>Figma, Adobe XD, Three.js, GSAP, Framer Motion, WebGL, Micro-interactions, Scroll Animations, 3D Elements</p></article>
+        <article class="skill-card reveal"><span>04</span><h3>DevOps and Tools</h3><p>Git, GitHub, VS Code, npm, Vite, Webpack, Render, Vercel, Netlify, Docker Basics, CI/CD, Chrome DevTools</p></article>
+        <article class="skill-card reveal"><span>05</span><h3>Databases</h3><p>MongoDB, MySQL, PostgreSQL, Firebase, Redis, Database Design, ORM, Data Modeling, CRUD Operations</p></article>
+        <article class="skill-card reveal"><span>06</span><h3>Testing and QA</h3><p>Manual Testing, Postman, Jest, Debugging, Cross-browser Testing, Responsive Testing, Performance Audits</p></article>
+        <article class="skill-card reveal"><span>07</span><h3>Cloud and Hosting</h3><p>Render, Vercel, Netlify, GitHub Pages, Domain Setup, SSL, CDN, Cloud Storage, Environment Variables</p></article>
+        <article class="skill-card reveal"><span>08</span><h3>Programming Fundamentals</h3><p>Java, Python, C++, Data Structures, Algorithms, OOP, Problem Solving, Clean Code, Documentation</p></article>
       </div>
     </section>
-
+    <section id="pricing" class="section pricing-section">
+      <div class="section-heading reveal">
+        <div>
+          <p class="eyebrow">Investment</p>
+          <h2>Pricing Packages</h2>
+        </div>
+        <p class="section-note">Choose a package that fits your needs. All prices are starting points and may vary based on project requirements.</p>
+      </div>
+      <div class="pricing-grid">
+        <article class="pricing-card reveal">
+          <div class="pricing-header">
+            <h3>Basic</h3>
+            <p class="pricing-desc">Perfect for simple websites and landing pages</p>
+            <p class="pricing-price">LKR 15,000 <small>starting</small></p>
+          </div>
+          <ul class="pricing-features">
+            <li>1-3 Pages</li>
+            <li>Responsive Design</li>
+            <li>Contact Form</li>
+            <li>Basic SEO</li>
+            <li>WhatsApp Integration</li>
+            <li>5 Days Delivery</li>
+          </ul>
+          <button class="button primary" onclick="selectPackage(''basic'')">Select Basic</button>
+        </article>
+        <article class="pricing-card featured reveal">
+          <div class="pricing-badge">Popular</div>
+          <div class="pricing-header">
+            <h3>Standard</h3>
+            <p class="pricing-desc">Great for business websites with features</p>
+            <p class="pricing-price">LKR 35,000 <small>starting</small></p>
+          </div>
+          <ul class="pricing-features">
+            <li>4-8 Pages</li>
+            <li>Responsive Design</li>
+            <li>Admin Dashboard</li>
+            <li>Database Integration</li>
+            <li>User Authentication</li>
+            <li>WhatsApp + Email</li>
+            <li>Advanced SEO</li>
+            <li>14 Days Delivery</li>
+          </ul>
+          <button class="button primary" onclick="selectPackage(''standard'')">Select Standard</button>
+        </article>
+        <article class="pricing-card reveal">
+          <div class="pricing-header">
+            <h3>Premium</h3>
+            <p class="pricing-desc">Full-scale web applications</p>
+            <p class="pricing-price">LKR 75,000 <small>starting</small></p>
+          </div>
+          <ul class="pricing-features">
+            <li>Unlimited Pages</li>
+            <li>Full Admin Panel</li>
+            <li>User System + Auth</li>
+            <li>Payment Integration</li>
+            <li>Advanced Features</li>
+            <li>Custom Animations</li>
+            <li>3D Elements</li>
+            <li>Priority Support</li>
+            <li>30 Days Delivery</li>
+          </ul>
+          <button class="button primary" onclick="selectPackage(''premium'')">Select Premium</button>
+        </article>
+      </div>
+    </section>
+    <section id="reviews" class="section reviews-section">
+      <div class="section-heading reveal">
+        <div>
+          <p class="eyebrow">Testimonials</p>
+          <h2>Client Reviews</h2>
+        </div>
+        <div class="reviews-summary reveal">
+          <div class="rating-big">
+            <span id="avg-rating">4.8</span>
+            <div class="stars" id="avg-stars">5.0</div>
+            <small id="review-count">Based on <span id="review-total">6</span> reviews</small>
+          </div>
+        </div>
+      </div>
+      <div id="reviews-grid" class="reviews-grid"></div>
+      <div class="review-form-wrapper reveal">
+        <h3>Leave a Review</h3>
+        <form id="review-form" class="review-form">
+          <div class="star-rating">
+            <input type="radio" id="star5" name="rating" value="5"><label for="star5" title="5 stars">5</label>
+            <input type="radio" id="star4" name="rating" value="4"><label for="star4" title="4 stars">4</label>
+            <input type="radio" id="star3" name="rating" value="3"><label for="star3" title="3 stars">3</label>
+            <input type="radio" id="star2" name="rating" value="2"><label for="star2" title="2 stars">2</label>
+            <input type="radio" id="star1" name="rating" value="1"><label for="star1" title="1 star">1</label>
+          </div>
+          <label>Your Name<input type="text" name="name" required></label>
+          <label>Your Company<input type="text" name="company" placeholder="Optional"></label>
+          <label class="full">Your Review<textarea name="message" rows="4" required placeholder="Share your experience working with me..."></textarea></label>
+          <button class="button primary" type="submit">Submit Review</button>
+          <p class="form-status" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
     <section id="hire" class="section hire-section">
       <div class="hire-copy reveal">
-        <p class="eyebrow">Hire Umar</p>
-        <h2>Need a website, dashboard, or admin system?</h2>
-        <p>Send your project details. The request is saved in the admin panel, then you can send the same message through WhatsApp or email.</p>
+        <p class="eyebrow">Get Started</p>
+        <h2>Let us Work Together</h2>
+        <p>Ready to bring your vision to life? Fill out the form and tell me about your project requirements.</p>
         <div class="direct-contact">
           <a href="https://wa.me/94771813023" target="_blank" rel="noopener">WhatsApp: +94 77 181 3023</a>
           <a href="mailto:umarxgamer04@gmail.com">umarxgamer04@gmail.com</a>
@@ -120,25 +281,66 @@
         <label>Name<input type="text" name="name" required></label>
         <label>Company<input type="text" name="company" placeholder="Optional"></label>
         <label>Email<input type="email" name="email" required></label>
-        <label>Phone / WhatsApp<input type="tel" name="phone" required></label>
-        <label>Budget<input type="text" name="budget" placeholder="Example: LKR 50,000"></label>
-        <label class="full">Project details<textarea name="message" rows="5" required placeholder="Tell me what you want to build"></textarea></label>
+        <label>Phone<input type="tel" name="phone" required></label>
+        <label class="full">Selected Package
+          <select name="package" id="package-select" required>
+            <option value="">Select a package...</option>
+            <option value="basic">Basic</option>
+            <option value="standard">Standard</option>
+            <option value="premium">Premium</option>
+            <option value="custom">Custom / Not Sure</option>
+          </select>
+        </label>
+        <label class="full">Project Type
+          <select name="projectType" id="project-type-select" required>
+            <option value="">What kind of project?</option>
+            <option value="website">Business Website</option>
+            <option value="webapp">Web Application</option>
+            <option value="ecommerce">E-commerce Store</option>
+            <option value="portfolio">Portfolio / Personal Site</option>
+            <option value="admin">Admin Dashboard</option>
+            <option value="landing">Landing Page</option>
+            <option value="blog">Blog / Content Site</option>
+            <option value="booking">Booking / Reservation System</option>
+            <option value="other">Other</option>
+          </select>
+        </label>
+        <label class="full">Features Needed (Select all that apply)
+          <div class="features-grid">
+            <label class="feature-checkbox"><input type="checkbox" name="features" value="responsive"> Responsive Design</label>
+            <label class="feature-checkbox"><input type="checkbox" name="features" value="admin"> Admin Panel</label>
+            <label class="feature-checkbox"><input type="checkbox" name="features" value="auth"> User Authentication</label>
+            <label class="feature-checkbox"><input type="checkbox" name="features" value="database"> Database Integration</label>
+            <label class="feature-checkbox"><input type="checkbox" name="features" value="payment"> Payment Integration</label>
+            <label class="feature-checkbox"><input type="checkbox" name="features" value="whatsapp"> WhatsApp Integration</label>
+            <label class="feature-checkbox"><input type="checkbox" name="features" value="seo"> SEO Optimization</label>
+            <label class="feature-checkbox"><input type="checkbox" name="features" value="animation"> Animations and Effects</label>
+            <label class="feature-checkbox"><input type="checkbox" name="features" value="3d"> 3D Elements</label>
+            <label class="feature-checkbox"><input type="checkbox" name="features" value="blog"> Blog / CMS</label>
+            <label class="feature-checkbox"><input type="checkbox" name="features" value="booking"> Booking / Scheduling</label>
+            <label class="feature-checkbox"><input type="checkbox" name="features" value="chat"> Live Chat</label>
+            <label class="feature-checkbox"><input type="checkbox" name="features" value="multilang"> Multi-language Support</label>
+            <label class="feature-checkbox"><input type="checkbox" name="features" value="api"> Third-party API Integration</label>
+            <label class="feature-checkbox"><input type="checkbox" name="features" value="custom"> Other (specify below)</label>
+          </div>
+        </label>
+        <label class="full">Additional Requirements<textarea name="additionalFeatures" rows="3" placeholder="Describe any other features or custom requirements you have in mind..."></textarea></label>
+        <label class="full">Project Details and Delivery<textarea name="message" rows="5" required placeholder="Describe your project requirements, timeline expectations, and any other details..."></textarea></label>
         <button class="button primary" type="submit">Hire me</button>
         <p class="form-status" role="status" aria-live="polite"></p>
       </form>
     </section>
-
     <section id="admin" class="section admin-section">
       <div class="section-heading reveal">
         <div>
           <p class="eyebrow">Private area</p>
-          <h2>Admin panel</h2>
+          <h2>Admin Panel</h2>
         </div>
         <button id="logout-button" class="button secondary dark hidden" type="button">Logout</button>
       </div>
 
       <form id="login-form" class="login-form reveal">
-        <h3>Admin login</h3>
+        <h3>Admin Login</h3>
         <label>Email<input type="email" name="email" required></label>
         <label>Password<input type="password" name="password" required></label>
         <button class="button primary" type="submit">Login</button>
@@ -150,7 +352,7 @@
 
         <div class="admin-layout">
           <form id="project-form" class="admin-form">
-            <h3>Create / update project</h3>
+            <h3>Create / Update Project</h3>
             <input type="hidden" name="id">
             <label>Title<input type="text" name="title" required></label>
             <label>Category<input type="text" name="category" required></label>
@@ -167,7 +369,7 @@
           </form>
 
           <section class="table-card">
-            <h3>Manage projects</h3>
+            <h3>Manage Projects</h3>
             <div class="table-wrap">
               <table>
                 <thead><tr><th>Project</th><th>Stack</th><th>Action</th></tr></thead>
@@ -178,11 +380,18 @@
         </div>
 
         <section class="table-card">
-          <h3>Hire requests</h3>
+          <h3>Hire Requests</h3>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Client</th><th>Message</th><th>Status</th><th>Contact</th></tr></thead>
+              <thead><tr><th>Client</th><th>Package/Project</th><th>Status</th><th>Contact</th></tr></thead>
               <tbody id="hire-requests-table"></tbody>
+            </table>
+          </div>
+          <h3 style="margin-top: 24px;">Reviews</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Rating</th><th>Review</th><th>Action</th></tr></thead>
+              <tbody id="admin-reviews-table"></tbody>
             </table>
           </div>
         </section>
@@ -192,18 +401,27 @@
 
   <footer class="site-footer">
     <span>Umar Portfolio</span>
+    <span><a href="https://linkedin.com/in/yourprofile" target="_blank" rel="noopener">LinkedIn</a> | <a href="https://github.com/yourusername" target="_blank" rel="noopener">GitHub</a></span>
     <span>+94 77 181 3023 | umarxgamer04@gmail.com</span>
   </footer>
 
   <dialog id="hire-dialog">
     <form method="dialog">
       <h3>Hire request saved</h3>
-      <p id="hire-dialog-text"></p>
+      <p>Your request has been received. Choose WhatsApp or email to send the message directly.</p>
       <div class="dialog-actions">
         <a id="hire-whatsapp-link" class="button primary" href="#" target="_blank" rel="noopener">Send WhatsApp</a>
         <a id="hire-email-link" class="button secondary dark" href="#">Send Email</a>
         <button class="button secondary dark" type="submit">Close</button>
       </div>
+    </form>
+  </dialog>
+
+  <dialog id="review-dialog">
+    <form method="dialog">
+      <h3>Thank You!</h3>
+      <p>Your review has been submitted and will be visible after approval.</p>
+      <button class="button primary" type="submit">Close</button>
     </form>
   </dialog>
 
