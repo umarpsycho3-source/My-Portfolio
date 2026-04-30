@@ -126,6 +126,63 @@ const seedProjects = [
   },
 ];
 
+const seedReviews = [
+  {
+    id: "review1",
+    name: "Ahmed Khan",
+    company: "TechStart Lanka",
+    approved: true,
+    rating: 5,
+    message: "Exceptional work on our restaurant website. Fast delivery and great communication throughout the project.",
+    createdAt: "2026-04-25T10:00:00Z",
+  },
+  {
+    id: "review2",
+    name: "Sarah Fernando",
+    company: "Fashion Forward",
+    approved: true,
+    rating: 5,
+    message: "Umar built us a stunning e-commerce platform. The attention to detail was impressive and the site works flawlessly.",
+    createdAt: "2026-04-26T14:30:00Z",
+  },
+  {
+    id: "review3",
+    name: "Ravi Silva",
+    company: "FitLife Gym",
+    approved: true,
+    rating: 4,
+    message: "Great developer. Built a complete gym management system with all the features we needed. Highly recommended.",
+    createdAt: "2026-04-27T09:15:00Z",
+  },
+  {
+    id: "review4",
+    name: "Nimal Perera",
+    company: "Coffee House Colombo",
+    approved: true,
+    rating: 5,
+    message: "Professional service from start to finish. The coffee shop website exceeded our expectations.",
+    createdAt: "2026-04-28T16:45:00Z",
+  },
+  {
+    id: "review5",
+    name: "Priya Jayawardena",
+    company: "Creative Agency",
+    approved: true,
+    rating: 5,
+    message: "Amazing portfolio. The animated elements really make the websites stand out.",
+    createdAt: "2026-04-29T11:20:00Z",
+  },
+  {
+    id: "review6",
+    name: "Kasun Dissanayake",
+    company: "Printy HUB",
+    approved: true,
+    rating: 5,
+    message: "Quick turnaround and excellent quality. Our new website has already brought us more customers.",
+    createdAt: "2026-04-30T08:00:00Z",
+  },
+];
+
 function ensureDataDir() {
   const candidates = [DATA_DIR, path.join(__dirname, "data"), path.join(os.tmpdir(), "umar-portfolio-data")];
   for (const candidate of candidates) {
@@ -149,6 +206,7 @@ function ensureDb() {
       sessions: [],
       projects: seedProjects,
       hireRequests: [],
+      reviews: seedReviews,
     });
   }
 
@@ -175,11 +233,12 @@ function ensureDb() {
 
   if (!Array.isArray(db.projects) || !db.projects.length) db.projects = seedProjects;
   if (!Array.isArray(db.hireRequests)) db.hireRequests = [];
+  if (!Array.isArray(db.reviews)) db.reviews = seedReviews;
   writeDb(db);
 }
 
 function readDb() {
-  return JSON.parse(fs.readFileSync(DB_FILE, "utf8"));
+  return JSON.parse(fs.readFileSync(DB_FILE, "utf8").replace(/^\uFEFF/, ""));
 }
 
 function writeDb(db) {
@@ -307,7 +366,10 @@ function hireMessage(request) {
     `Company: ${request.company || "Not provided"}`,
     `Email: ${request.email}`,
     `Phone: ${request.phone}`,
-    `Budget: ${request.budget || "Not provided"}`,
+    `Package: ${request.package || request.budget || "Not provided"}`,
+    `Project type: ${request.projectType || "Not provided"}`,
+    `Features: ${Array.isArray(request.features) && request.features.length ? request.features.join(", ") : "Not provided"}`,
+    `Additional requirements: ${request.additionalFeatures || "Not provided"}`,
     `Project: ${request.message}`,
   ].join("\n");
 }
@@ -389,6 +451,10 @@ async function handleApi(req, res, pathname) {
       email: String(payload.email).trim(),
       phone: String(payload.phone).trim(),
       budget: String(payload.budget || "").trim(),
+      package: String(payload.package || payload.budget || "").trim(),
+      projectType: String(payload.projectType || "").trim(),
+      features: Array.isArray(payload.features) ? payload.features.map(String).map((item) => item.trim()).filter(Boolean) : [],
+      additionalFeatures: String(payload.additionalFeatures || "").trim(),
       message: String(payload.message).trim(),
       status: "New",
       createdAt: new Date().toISOString(),
@@ -426,31 +492,31 @@ async function handleApi(req, res, pathname) {
 
   if (req.method === "GET" && pathname === "/api/admin/reviews") {
     if (!requireAdmin(req, res, db)) return;
-    const db = readDb();
-    return json(res, 200, { reviews: (db.reviews || []).reverse() });
+    const adminDb = readDb();
+    return json(res, 200, { reviews: (adminDb.reviews || []).slice().reverse() });
   }
 
-  const reviewMatch = pathname.match(/^\/(api\/admin\/reviews\/[^/]+)$/);
+  const reviewMatch = pathname.match(/^\/api\/admin\/reviews\/([^/]+)$/);
   if (reviewMatch) {
     if (!requireAdmin(req, res, db)) return;
-    const id = decodeURIComponent(req.url.split("/").pop());
-    const db = readDb();
-    const review = db.reviews.find(item => item.id === id);
+    const id = decodeURIComponent(reviewMatch[1]);
+    const reviewDb = readDb();
+    const review = (reviewDb.reviews || []).find(item => item.id === id);
     if (!review) return error(res, 404, "Review not found");
     if (req.method === "PUT") {
       const payload = await readBody(req);
       if (typeof payload.approved !== "undefined") review.approved = Boolean(payload.approved);
-      writeDb(db);
+      writeDb(reviewDb);
       return json(res, 200, { review });
     }
     if (req.method === "DELETE") {
-      db.reviews = db.reviews.filter(item => item.id !== id);
-      writeDb(db);
+      reviewDb.reviews = (reviewDb.reviews || []).filter(item => item.id !== id);
+      writeDb(reviewDb);
       return json(res, 200, { ok: true });
     }
   }
 
-   {
+  if (req.method === "GET" && pathname === "/api/admin/dashboard") {
     if (!requireAdmin(req, res, db)) return;
     return json(res, 200, {
       reports: reports(db),
