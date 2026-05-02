@@ -87,6 +87,10 @@ function initReveal() {
     return;
   }
 
+  revealItems.forEach((element, index) => {
+    element.style.transitionDelay = `${Math.min(index * 40, 280)}ms`;
+  });
+
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {

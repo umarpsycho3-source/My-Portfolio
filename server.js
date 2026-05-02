@@ -429,11 +429,13 @@ function addSecurityHeaders(res, req = null) {
   // Content Security Policy
   res.setHeader('Content-Security-Policy',
     "default-src 'self'; " +
+    "base-uri 'self'; " +
+    "object-src 'none'; " +
     "script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com 'unsafe-inline'; " +
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
     "img-src 'self' https: data:; " +
     "font-src 'self' https://fonts.gstatic.com; " +
-    "connect-src 'self' https://www.google-analytics.com; " +
+    "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com; " +
     "frame-ancestors 'none'"
   );
 
@@ -810,7 +812,25 @@ const server = http.createServer(async (req, res) => {
 
   // Add CORS headers for API requests
   if (url.pathname.startsWith("/api/")) {
-    res.setHeader('Access-Control-Allow-Origin', IS_PRODUCTION ? process.env.ALLOWED_ORIGIN || "*" : "*");
+    let allowedOrigin = "*";
+    if (IS_PRODUCTION) {
+      const configuredOrigin = process.env.ALLOWED_ORIGIN;
+      if (configuredOrigin) {
+        allowedOrigin = configuredOrigin;
+      } else {
+        const requestOrigin = req.headers.origin;
+        const host = req.headers.host;
+        if (requestOrigin && host) {
+          try {
+            const originHost = new URL(requestOrigin).host;
+            if (originHost === host) allowedOrigin = requestOrigin;
+          } catch (_) {
+            // Ignore malformed origin and avoid setting wildcard in production.
+          }
+        }
+      }
+    }
+    if (allowedOrigin) res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.setHeader('Access-Control-Max-Age', '86400');
