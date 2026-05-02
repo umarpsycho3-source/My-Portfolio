@@ -3,7 +3,11 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const os = require("os");
+const url = require("url");
 
+// ============ SECURITY CONFIG ============
+const NODE_ENV = process.env.NODE_ENV || "development";
+const IS_PRODUCTION = NODE_ENV === "production";
 const PORT = Number(process.env.PORT || 5678);
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "umarxgamer04@gmail.com";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "PortfolioAdmin2026!";
@@ -15,6 +19,19 @@ let DB_FILE = path.join(DATA_DIR, "database.json");
 const CV_FILE = process.env.CV_FILE || path.join(__dirname, "assets", "Umar CV.pdf");
 const PROFILE_IMAGE_FILE = process.env.PROFILE_IMAGE_FILE || path.join(__dirname, "assets", "my profile image.jpeg");
 const SESSION_TTL_MS = 1000 * 60 * 60 * 12;
+
+// ============ RATE LIMITING ============
+const rateLimitStore = new Map();
+const RATE_LIMITS = {
+  login: { maxRequests: 5, windowMs: 15 * 60 * 1000 }, // 5 requests per 15 minutes
+  hire: { maxRequests: 10, windowMs: 60 * 60 * 1000 }, // 10 requests per hour
+  review: { maxRequests: 5, windowMs: 60 * 60 * 1000 }, // 5 reviews per hour
+  default: { maxRequests: 100, windowMs: 15 * 60 * 1000 }, // 100 requests per 15 minutes
+};
+
+// ============ CSRF TOKEN STORE ============
+const csrfTokenStore = new Map();
+const CSRF_TOKEN_TTL = 1000 * 60 * 60; // 1 hour
 
 const mimeTypes = {
   ".html": "text/html; charset=utf-8",
@@ -336,15 +353,106 @@ function createSession(db, userId) {
 }
 
 function setSessionCookie(session) {
-  return `sessionId=${encodeURIComponent(session.id)}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${SESSION_TTL_MS / 1000}`;
+  // Secure cookies: HttpOnly (prevent XSS access), SameSite=Strict (prevent CSRF), Secure (HTTPS only in production)
+  const secure = IS_PRODUCTION ? "; Secure" : "";
+  return `sessionId=${encodeURIComponent(session.id)}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${SESSION_TTL_MS / 1000}${secure}`;
 }
 
 function clearSessionCookie() {
-  return "sessionId=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0";
+  const secure = IS_PRODUCTION ? "; Secure" : "";
+  return `sessionId=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0${secure}`;
 }
 
 function missing(payload, fields) {
   return fields.find((field) => payload[field] === undefined || payload[field] === null || String(payload[field]).trim() === "");
+}
+
+// ============ SECURITY FUNCTIONS ============
+
+function checkRateLimit(identifier, endpoint = "default") {
+  const limit = RATE_LIMITS[endpoint] || RATE_LIMITS.default;
+  const key = `${endpoint}:${identifier}`;
+  const now = Date.now();
+
+  if (!rateLimitStore.has(key)) {
+    rateLimitStore.set(key, []);
+  }
+
+  let requests = rateLimitStore.get(key);
+  requests = requests.filter(timestamp => now - timestamp < limit.windowMs);
+
+  if (requests.length >= limit.maxRequests) {
+    return false;
+  }
+
+  requests.push(now);
+  rateLimitStore.set(key, requests);
+  return true;
+}
+
+function sanitizeInput(input) {
+  if (typeof input !== "string") return input;
+  return input
+    .replace(/[<>"']/g, match => ({ '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;' }[match]))
+    .trim();
+}
+
+function validateEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(String(email).toLowerCase());
+}
+
+function validatePassword(password) {
+  // Minimum 8 characters, at least one uppercase, one lowercase, one number, one special char
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  return passwordRegex.test(password);
+}
+
+function generateCSRFToken() {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+function getClientIp(req) {
+  return (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+}
+
+function addSecurityHeaders(res, req = null) {
+  // Prevent clickjacking
+  res.setHeader('X-Frame-Options', 'DENY');
+
+  // Prevent MIME type sniffing
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+
+  // Enable XSS protection
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+
+  // Content Security Policy
+  res.setHeader('Content-Security-Policy',
+    "default-src 'self'; " +
+    "script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com 'unsafe-inline'; " +
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+    "img-src 'self' https: data:; " +
+    "font-src 'self' https://fonts.gstatic.com; " +
+    "connect-src 'self' https://www.google-analytics.com; " +
+    "frame-ancestors 'none'"
+  );
+
+  // Referrer Policy
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+  // Feature Policy
+  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+
+  // HSTS (only in production)
+  if (IS_PRODUCTION) {
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  }
+}
+
+function logSecurityEvent(event, details = {}) {
+  if (!IS_PRODUCTION) {
+    console.log(`[SECURITY] ${event}`, details);
+  }
 }
 
 function profile() {
@@ -421,13 +529,33 @@ async function handleApi(req, res, pathname) {
   if (req.method === "GET" && pathname === "/api/me") return json(res, 200, { user: publicUser(currentUser(req, db)) });
 
   if (req.method === "POST" && pathname === "/api/login") {
+    const clientIp = getClientIp(req);
+
+    // Rate limiting for login attempts
+    if (!checkRateLimit(clientIp, "login")) {
+      logSecurityEvent("Login rate limit exceeded", { ip: clientIp });
+      return error(res, 429, "Too many login attempts. Please try again later.");
+    }
+
     const payload = await readBody(req);
     const field = missing(payload, ["email", "password"]);
     if (field) return error(res, 400, `${field} is required`);
+
+    // Validate email format
+    if (!validateEmail(payload.email)) {
+      logSecurityEvent("Invalid email format attempted", { ip: clientIp });
+      return error(res, 400, "Invalid email format");
+    }
+
     const user = db.users.find((item) => item.email.toLowerCase() === String(payload.email).trim().toLowerCase());
-    if (!user || !verifyPassword(String(payload.password), user.passwordHash)) return error(res, 401, "Invalid email or password");
+    if (!user || !verifyPassword(String(payload.password), user.passwordHash)) {
+      logSecurityEvent("Failed login attempt", { email: payload.email, ip: clientIp });
+      return error(res, 401, "Invalid email or password");
+    }
+
     const session = createSession(db, user.id);
     writeDb(db);
+    logSecurityEvent("Successful login", { email: user.email, ip: clientIp });
     return json(res, 200, { user: publicUser(user) }, { "Set-Cookie": setSessionCookie(session) });
   }
 
@@ -441,52 +569,88 @@ async function handleApi(req, res, pathname) {
   }
 
   if (req.method === "POST" && pathname === "/api/hire") {
+    const clientIp = getClientIp(req);
+
+    // Rate limiting for hire requests
+    if (!checkRateLimit(clientIp, "hire")) {
+      logSecurityEvent("Hire request rate limit exceeded", { ip: clientIp });
+      return error(res, 429, "Too many hire requests. Please try again later.");
+    }
+
     const payload = await readBody(req);
     const field = missing(payload, ["name", "email", "phone", "message"]);
     if (field) return error(res, 400, `${field} is required`);
+
+    // Validate email format
+    if (!validateEmail(payload.email)) {
+      return error(res, 400, "Invalid email format");
+    }
+
+    // Validate phone format (basic)
+    if (!/^[\d\s\-\+\(\)]+$/.test(String(payload.phone))) {
+      return error(res, 400, "Invalid phone format");
+    }
+
+    // Sanitize inputs
     const request = {
       id: crypto.randomUUID(),
-      name: String(payload.name).trim(),
-      company: String(payload.company || "").trim(),
-      email: String(payload.email).trim(),
+      name: sanitizeInput(payload.name),
+      company: sanitizeInput(payload.company || ""),
+      email: String(payload.email).trim().toLowerCase(),
       phone: String(payload.phone).trim(),
-      budget: String(payload.budget || "").trim(),
-      package: String(payload.package || payload.budget || "").trim(),
-      projectType: String(payload.projectType || "").trim(),
-      features: Array.isArray(payload.features) ? payload.features.map(String).map((item) => item.trim()).filter(Boolean) : [],
-      additionalFeatures: String(payload.additionalFeatures || "").trim(),
-      message: String(payload.message).trim(),
+      budget: sanitizeInput(payload.budget || ""),
+      package: sanitizeInput(payload.package || payload.budget || ""),
+      projectType: sanitizeInput(payload.projectType || ""),
+      features: Array.isArray(payload.features) ? payload.features.map(String).map(sanitizeInput).filter(Boolean) : [],
+      additionalFeatures: sanitizeInput(payload.additionalFeatures || ""),
+      message: sanitizeInput(payload.message),
       status: "New",
       createdAt: new Date().toISOString(),
     };
     db.hireRequests.push(request);
     writeDb(db);
+    logSecurityEvent("New hire request", { email: request.email, ip: clientIp });
     return json(res, 201, { request: withContactLinks(request) });
   }
 
-  
+
   if (req.method === "GET" && pathname === "/api/reviews") {
     const db = readDb();
     return json(res, 200, (db.reviews || []).filter(r => r.approved));
   }
 
   if (req.method === "POST" && pathname === "/api/reviews") {
+    const clientIp = getClientIp(req);
+
+    // Rate limiting for reviews
+    if (!checkRateLimit(clientIp, "review")) {
+      logSecurityEvent("Review rate limit exceeded", { ip: clientIp });
+      return error(res, 429, "Too many reviews. Please try again later.");
+    }
+
     const payload = await readBody(req);
     const field = missing(payload, ["name", "rating", "message"]);
     if (field) return error(res, 400, field + " is required");
+
+    const rating = parseInt(payload.rating) || 5;
+    if (rating < 1 || rating > 5) {
+      return error(res, 400, "Rating must be between 1 and 5");
+    }
+
     const db = readDb();
     if (!db.reviews) db.reviews = [];
     const review = {
       id: crypto.randomUUID(),
-      name: String(payload.name).trim(),
-      company: String(payload.company || "").trim(),
-      rating: parseInt(payload.rating) || 5,
-      message: String(payload.message).trim(),
+      name: sanitizeInput(payload.name),
+      company: sanitizeInput(payload.company || ""),
+      rating: rating,
+      message: sanitizeInput(payload.message),
       approved: false,
       createdAt: new Date().toISOString()
     };
     db.reviews.push(review);
     writeDb(db);
+    logSecurityEvent("New review submitted", { name: review.name, ip: clientIp });
     return json(res, 201, { review });
   }
 
@@ -640,6 +804,24 @@ ensureDb();
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
+
+  // Add security headers to all responses
+  addSecurityHeaders(res, req);
+
+  // Add CORS headers for API requests
+  if (url.pathname.startsWith("/api/")) {
+    res.setHeader('Access-Control-Allow-Origin', IS_PRODUCTION ? process.env.ALLOWED_ORIGIN || "*" : "*");
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Max-Age', '86400');
+
+    // Handle OPTIONS requests
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204);
+      return res.end();
+    }
+  }
+
   try {
     if (url.pathname.startsWith("/api/")) {
       await handleApi(req, res, url.pathname);
@@ -647,12 +829,17 @@ const server = http.createServer(async (req, res) => {
     }
     serveStatic(req, res, decodeURIComponent(url.pathname));
   } catch (requestError) {
-    error(res, 500, requestError.message || "Server error");
+    logSecurityEvent("Request error", { error: requestError.message, path: url.pathname });
+    error(res, 500, "Server error");
   }
 });
 
 server.listen(PORT, () => {
-  console.log(`Portfolio website running at http://localhost:${PORT}`);
-  console.log(`Admin email: ${ADMIN_EMAIL}`);
-  console.log(`Admin password: ${ADMIN_PASSWORD}`);
+  console.log(`🔒 Portfolio website running at http://localhost:${PORT}`);
+  console.log(`📧 Admin email: ${ADMIN_EMAIL}`);
+  if (!IS_PRODUCTION) {
+    console.log(`⚠️  Admin password: ${ADMIN_PASSWORD}`);
+  }
+  console.log(`🛡️  Security headers enabled`);
+  console.log(`⏰ Rate limiting enabled`);
 });
