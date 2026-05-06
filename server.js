@@ -4,6 +4,7 @@ const path = require("path");
 const crypto = require("crypto");
 const os = require("os");
 const url = require("url");
+const { MongoClient } = require("mongodb");
 
 // ============ SECURITY CONFIG ============
 const NODE_ENV = process.env.NODE_ENV || "development";
@@ -16,6 +17,9 @@ const CONTACT_WHATSAPP = process.env.CONTACT_WHATSAPP || "94771813023";
 const CONTACT_EMAIL = process.env.CONTACT_EMAIL || "umarxgamer04@gmail.com";
 let DATA_DIR = process.env.DATA_DIR || path.join(__dirname, "data");
 let DB_FILE = path.join(DATA_DIR, "database.json");
+const MONGODB_URI = process.env.MONGODB_URI || "";
+const MONGODB_DB_NAME = process.env.MONGODB_DB_NAME || "portfolio";
+const MONGODB_COLLECTION = process.env.MONGODB_COLLECTION || "state";
 const CV_FILE = process.env.CV_FILE || path.join(__dirname, "assets", "Umar CV.pdf");
 const PROFILE_IMAGE_FILE = process.env.PROFILE_IMAGE_FILE || path.join(__dirname, "assets", "my profile image.jpeg");
 const SESSION_TTL_MS = 1000 * 60 * 60 * 12;
@@ -215,19 +219,57 @@ function ensureDataDir() {
   throw new Error("No writable data directory is available.");
 }
 
-function ensureDb() {
-  ensureDataDir();
-  if (!fs.existsSync(DB_FILE)) {
-    writeDb({
-      users: [],
-      sessions: [],
-      projects: seedProjects,
-      hireRequests: [],
-      reviews: seedReviews,
-    });
+let mongoClient = null;
+let mongoCollection = null;
+let useMongoStorage = false;
+let inMemoryDb = null;
+
+function createInitialDb() {
+  return {
+    users: [],
+    sessions: [],
+    projects: seedProjects,
+    hireRequests: [],
+    reviews: seedReviews,
+  };
+}
+
+async function connectMongo() {
+  if (!MONGODB_URI) return false;
+  try {
+    mongoClient = new MongoClient(MONGODB_URI);
+    await mongoClient.connect();
+    mongoCollection = mongoClient.db(MONGODB_DB_NAME).collection(MONGODB_COLLECTION);
+    useMongoStorage = true;
+    console.log("✅ Connected to MongoDB Atlas storage");
+    return true;
+  } catch (error) {
+    console.warn(`MongoDB unavailable (${error.message}). Falling back to file storage.`);
+    useMongoStorage = false;
+    mongoClient = null;
+    mongoCollection = null;
+    return false;
+  }
+}
+
+async function ensureDb() {
+  await connectMongo();
+
+  if (useMongoStorage) {
+    const existing = await mongoCollection.findOne({ _id: "main" });
+    if (!existing) {
+      inMemoryDb = createInitialDb();
+      await mongoCollection.insertOne({ _id: "main", ...inMemoryDb });
+    } else {
+      inMemoryDb = existing;
+    }
+  } else {
+    ensureDataDir();
+    if (!fs.existsSync(DB_FILE)) writeDb(createInitialDb());
+    inMemoryDb = readDb();
   }
 
-  const db = readDb();
+  const db = inMemoryDb;
   const adminHash = hashPassword(ADMIN_PASSWORD);
   const admin = db.users.find((user) => user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
 
@@ -251,7 +293,7 @@ function ensureDb() {
   if (!Array.isArray(db.projects) || !db.projects.length) db.projects = seedProjects;
   if (!Array.isArray(db.hireRequests)) db.hireRequests = [];
   if (!Array.isArray(db.reviews)) db.reviews = seedReviews;
-  writeDb(db);
+  await saveDb(db);
 }
 
 function readDb() {
@@ -260,6 +302,37 @@ function readDb() {
 
 function writeDb(db) {
   fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
+}
+
+async function loadDb() {
+  if (useMongoStorage) {
+    const db = await mongoCollection.findOne({ _id: "main" });
+    inMemoryDb = db || createInitialDb();
+    return inMemoryDb;
+  }
+  inMemoryDb = readDb();
+  return inMemoryDb;
+}
+
+async function saveDb(db) {
+  inMemoryDb = db;
+  if (useMongoStorage) {
+    await mongoCollection.updateOne(
+      { _id: "main" },
+      {
+        $set: {
+          users: db.users || [],
+          sessions: db.sessions || [],
+          projects: db.projects || [],
+          hireRequests: db.hireRequests || [],
+          reviews: db.reviews || [],
+        },
+      },
+      { upsert: true }
+    );
+    return;
+  }
+  writeDb(db);
 }
 
 function hashPassword(password, salt = crypto.randomBytes(16).toString("hex")) {
@@ -524,7 +597,7 @@ function reports(db) {
 }
 
 async function handleApi(req, res, pathname) {
-  const db = readDb();
+  const db = await loadDb();
 
   if (req.method === "GET" && pathname === "/api/profile") return json(res, 200, { profile: profile() });
   if (req.method === "GET" && pathname === "/api/projects") return json(res, 200, { projects: db.projects });
@@ -556,7 +629,7 @@ async function handleApi(req, res, pathname) {
     }
 
     const session = createSession(db, user.id);
-    writeDb(db);
+    await saveDb(db);
     logSecurityEvent("Successful login", { email: user.email, ip: clientIp });
     return json(res, 200, { user: publicUser(user) }, { "Set-Cookie": setSessionCookie(session) });
   }
@@ -565,7 +638,7 @@ async function handleApi(req, res, pathname) {
     const sessionId = parseCookies(req).sessionId;
     if (sessionId) {
       db.sessions = db.sessions.filter((session) => session.id !== sessionId);
-      writeDb(db);
+      await saveDb(db);
     }
     return json(res, 200, { ok: true }, { "Set-Cookie": clearSessionCookie() });
   }
@@ -610,14 +683,14 @@ async function handleApi(req, res, pathname) {
       createdAt: new Date().toISOString(),
     };
     db.hireRequests.push(request);
-    writeDb(db);
+    await saveDb(db);
     logSecurityEvent("New hire request", { email: request.email, ip: clientIp });
     return json(res, 201, { request: withContactLinks(request) });
   }
 
 
   if (req.method === "GET" && pathname === "/api/reviews") {
-    const db = readDb();
+    const db = await loadDb();
     return json(res, 200, (db.reviews || []).filter(r => r.approved));
   }
 
@@ -639,7 +712,7 @@ async function handleApi(req, res, pathname) {
       return error(res, 400, "Rating must be between 1 and 5");
     }
 
-    const db = readDb();
+    const db = await loadDb();
     if (!db.reviews) db.reviews = [];
     const review = {
       id: crypto.randomUUID(),
@@ -651,14 +724,14 @@ async function handleApi(req, res, pathname) {
       createdAt: new Date().toISOString()
     };
     db.reviews.push(review);
-    writeDb(db);
+    await saveDb(db);
     logSecurityEvent("New review submitted", { name: review.name, ip: clientIp });
     return json(res, 201, { review });
   }
 
   if (req.method === "GET" && pathname === "/api/admin/reviews") {
     if (!requireAdmin(req, res, db)) return;
-    const adminDb = readDb();
+    const adminDb = await loadDb();
     return json(res, 200, { reviews: (adminDb.reviews || []).slice().reverse() });
   }
 
@@ -666,18 +739,18 @@ async function handleApi(req, res, pathname) {
   if (reviewMatch) {
     if (!requireAdmin(req, res, db)) return;
     const id = decodeURIComponent(reviewMatch[1]);
-    const reviewDb = readDb();
+    const reviewDb = await loadDb();
     const review = (reviewDb.reviews || []).find(item => item.id === id);
     if (!review) return error(res, 404, "Review not found");
     if (req.method === "PUT") {
       const payload = await readBody(req);
       if (typeof payload.approved !== "undefined") review.approved = Boolean(payload.approved);
-      writeDb(reviewDb);
+      await saveDb(reviewDb);
       return json(res, 200, { review });
     }
     if (req.method === "DELETE") {
       reviewDb.reviews = (reviewDb.reviews || []).filter(item => item.id !== id);
-      writeDb(reviewDb);
+      await saveDb(reviewDb);
       return json(res, 200, { ok: true });
     }
   }
@@ -699,7 +772,7 @@ async function handleApi(req, res, pathname) {
     if (field) return error(res, 400, `${field} is required`);
     const project = projectPayload(payload);
     db.projects.push(project);
-    writeDb(db);
+    await saveDb(db);
     return json(res, 201, { project });
   }
 
@@ -713,12 +786,12 @@ async function handleApi(req, res, pathname) {
       const payload = await readBody(req);
       const next = projectPayload(payload, project);
       Object.assign(project, next);
-      writeDb(db);
+      await saveDb(db);
       return json(res, 200, { project });
     }
     if (req.method === "DELETE") {
       db.projects = db.projects.filter((item) => item.id !== id);
-      writeDb(db);
+      await saveDb(db);
       return json(res, 200, { ok: true });
     }
   }
@@ -732,12 +805,12 @@ async function handleApi(req, res, pathname) {
     if (req.method === "PUT") {
       const payload = await readBody(req);
       request.status = String(payload.status || request.status).trim();
-      writeDb(db);
+      await saveDb(db);
       return json(res, 200, { request: withContactLinks(request) });
     }
     if (req.method === "DELETE") {
       db.hireRequests = db.hireRequests.filter((item) => item.id !== id);
-      writeDb(db);
+      await saveDb(db);
       return json(res, 200, { ok: true });
     }
   }
@@ -802,8 +875,6 @@ function serveCv(res) {
   });
 }
 
-ensureDb();
-
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
 
@@ -854,12 +925,20 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(PORT, () => {
-  console.log(`🔒 Portfolio website running at http://localhost:${PORT}`);
-  console.log(`📧 Admin email: ${ADMIN_EMAIL}`);
-  if (!IS_PRODUCTION) {
-    console.log(`⚠️  Admin password: ${ADMIN_PASSWORD}`);
-  }
-  console.log(`🛡️  Security headers enabled`);
-  console.log(`⏰ Rate limiting enabled`);
-});
+ensureDb()
+  .then(() => {
+    server.listen(PORT, () => {
+      console.log(`🔒 Portfolio website running at http://localhost:${PORT}`);
+      console.log(`📧 Admin email: ${ADMIN_EMAIL}`);
+      if (!IS_PRODUCTION) {
+        console.log(`⚠️  Admin password: ${ADMIN_PASSWORD}`);
+      }
+      console.log(`🛡️  Security headers enabled`);
+      console.log(`⏰ Rate limiting enabled`);
+      console.log(`💾 Storage mode: ${useMongoStorage ? "MongoDB Atlas" : "Local file (non-persistent on Render Free)"}`);
+    });
+  })
+  .catch((bootError) => {
+    console.error("Failed to initialize database:", bootError);
+    process.exit(1);
+  });
