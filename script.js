@@ -60,6 +60,11 @@ const setStatus = (form, message, isError = false) => {
   status.classList.toggle("error", isError);
 };
 
+const trackEvent = (eventName, params = {}) => {
+  if (typeof window.gtag !== "function") return;
+  window.gtag("event", eventName, params);
+};
+
 function initHeader() {
   if (!header || !navToggle || !nav) return;
 
@@ -426,10 +431,22 @@ function initForms() {
       if (hireWhatsappLink) hireWhatsappLink.href = result.request.whatsappUrl;
       if (hireEmailLink) hireEmailLink.href = result.request.emailUrl;
       hireDialog?.showModal();
+      trackEvent("hire_form_submit", {
+        event_category: "engagement",
+        event_label: result.request.package || result.request.projectType || "general",
+      });
       await loadAdmin();
     } catch (error) {
       setStatus(hireForm, error.message, true);
     }
+  });
+
+  hireWhatsappLink?.addEventListener("click", () => {
+    trackEvent("whatsapp_click", { event_category: "lead", event_label: "hire_dialog" });
+  });
+
+  hireEmailLink?.addEventListener("click", () => {
+    trackEvent("email_click", { event_category: "lead", event_label: "hire_dialog" });
   });
 
   reviewForm?.addEventListener("submit", async (event) => {
@@ -500,6 +517,18 @@ function initForms() {
 }
 
 function initAdminActions() {
+  projectsGrid?.addEventListener("click", (event) => {
+    const link = event.target.closest("a");
+    if (!link) return;
+    const card = event.target.closest(".project-card");
+    const projectTitle = card?.querySelector("h3")?.textContent?.trim() || "unknown_project";
+    const buttonType = link.textContent?.trim().toLowerCase() || "project_link";
+    trackEvent("project_click", {
+      event_category: "engagement",
+      event_label: `${projectTitle}:${buttonType}`,
+    });
+  });
+
   document.addEventListener("click", async (event) => {
     const editProjectButton = event.target.closest("[data-edit-project]");
     const deleteProjectButton = event.target.closest("[data-delete-project]");
