@@ -9,7 +9,10 @@
     function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
 
-    gtag('config', 'G-CKY4PWCPNC');
+    gtag('config', 'G-CKY4PWCPNC', {
+      allow_google_signals: false,
+      allow_ad_personalization_signals: false
+    });
   </script>
 
   <meta charset="UTF-8">

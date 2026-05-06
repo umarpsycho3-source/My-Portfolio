@@ -510,7 +510,7 @@ function addSecurityHeaders(res, req = null) {
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
     "img-src 'self' https: data:; " +
     "font-src 'self' https://fonts.gstatic.com; " +
-    "connect-src 'self' https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://stats.g.doubleclick.net; " +
+    "connect-src 'self' https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://stats.g.doubleclick.net https://www.google.com https://www.google.lk; " +
     "frame-ancestors 'none'"
   );
 
