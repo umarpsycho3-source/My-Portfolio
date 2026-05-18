@@ -85,6 +85,15 @@ function initHeader() {
   setHeaderState();
   window.addEventListener("scroll", setHeaderState);
 
+  const resetNavState = () => {
+    if (window.innerWidth > 1180) {
+      nav.classList.remove("open");
+      navToggle.setAttribute("aria-expanded", "false");
+    }
+  };
+  window.addEventListener("resize", resetNavState);
+  resetNavState();
+
   navToggle.addEventListener("click", () => {
     const open = nav.classList.toggle("open");
     navToggle.setAttribute("aria-expanded", String(open));
