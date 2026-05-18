@@ -321,23 +321,6 @@ async function loadMarketRates() {
   }
 }
 
-function assistantReply(input) {
-  const text = String(input || "").toLowerCase();
-  if (text.includes("price") || text.includes("budget") || text.includes("cost")) {
-    return "Most projects start from Basic LKR 15,000, Standard LKR 35,000, and Premium LKR 75,000. Share your features and I can estimate your best-fit package.";
-  }
-  if (text.includes("time") || text.includes("delivery") || text.includes("timeline")) {
-    return "Typical delivery is 5 days (Basic), 14 days (Standard), and 30 days (Premium). Complex custom features can extend this slightly.";
-  }
-  if (text.includes("contact") || text.includes("whatsapp") || text.includes("email")) {
-    return "You can contact Umar via WhatsApp +94 77 181 3023 or email umarxgamer04@gmail.com. You can also submit the Hire form for a structured proposal.";
-  }
-  if (text.includes("project") || text.includes("start")) {
-    return "To start, pick a package, fill the Hire form with project type and features, and you will receive a response with next steps quickly.";
-  }
-  return "I can help with package selection, timeline, pricing, and project planning. Ask me what you want to build and I will guide you.";
-}
-
 function pushAssistantMessage(message, sender = "bot") {
   if (!aiChatMessages) return;
   const bubble = document.createElement("article");
@@ -359,13 +342,33 @@ function initAssistant() {
   aiChatToggle.addEventListener("click", () => setOpen(!aiChatPanel.classList.contains("open")));
   aiChatClose?.addEventListener("click", () => setOpen(false));
 
-  aiChatForm?.addEventListener("submit", (event) => {
+  aiChatForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
     const text = aiChatInput?.value?.trim();
     if (!text) return;
     pushAssistantMessage(text, "user");
-    const reply = assistantReply(text);
-    window.setTimeout(() => pushAssistantMessage(reply, "bot"), 350);
+    pushAssistantMessage("Thinking...", "bot");
+    const pendingBubble = aiChatMessages?.lastElementChild;
+    if (aiChatInput) aiChatInput.disabled = true;
+    const submitButton = aiChatForm.querySelector("button[type='submit']");
+    if (submitButton) submitButton.disabled = true;
+
+    try {
+      const result = await api("/api/assistant", {
+        method: "POST",
+        body: JSON.stringify({ message: text }),
+      });
+      if (pendingBubble) pendingBubble.remove();
+      pushAssistantMessage(result.reply || "I can help with package, timeline, and pricing guidance.", "bot");
+    } catch (error) {
+      if (pendingBubble) pendingBubble.remove();
+      pushAssistantMessage(`Assistant error: ${error.message}`, "bot");
+    } finally {
+      if (aiChatInput) aiChatInput.disabled = false;
+      if (submitButton) submitButton.disabled = false;
+      aiChatInput?.focus();
+    }
+
     aiChatForm.reset();
   });
 }
