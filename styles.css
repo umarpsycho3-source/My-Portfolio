@@ -1435,10 +1435,20 @@ dialog p { color: var(--muted); }
   .hero.hero-premium .hero-actions .button {
     width: 100% !important;
     min-width: 0 !important;
-    font-size: .95rem !important;
+    font-size: 1rem !important;
+    font-weight: 900 !important;
+    line-height: 1.2 !important;
     white-space: normal !important;
     text-align: center !important;
     transform: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 52px !important;
+    padding: 12px 14px !important;
+    letter-spacing: 0 !important;
+    z-index: 1 !important;
+    position: relative !important;
   }
 
   /* Disable magnetic/touch drift on mobile buttons */
@@ -1446,8 +1456,36 @@ dialog p { color: var(--muted); }
     transform: none !important;
   }
 
+  /* Ensure button labels are visible on mobile */
+  .hero-premium .hero-actions .button.primary {
+    color: #071226 !important;
+    background: linear-gradient(135deg, #a3ff12, #5eead4) !important;
+  }
+  .hero-premium .hero-actions .button.secondary,
+  .hero-premium .hero-actions .button.cv-button {
+    color: #f8fbff !important;
+    border-color: rgba(255,255,255,.78) !important;
+    background: linear-gradient(135deg, rgba(10,24,50,.86), rgba(18,26,56,.72)) !important;
+  }
+
+  /* Disable sweep overlay on phone to avoid text masking */
+  .hero-premium .hero-actions .button::after {
+    display: none !important;
+  }
+
   .hero-premium .hero-stats {
-    margin-bottom: 120px !important;
+    margin-top: 10px !important;
+    margin-bottom: 124px !important;
+    gap: 8px !important;
+  }
+
+  .hero-premium .hero-stats article {
+    min-height: 94px !important;
+    padding: 12px !important;
+  }
+
+  .hero-premium .hero-content {
+    padding-inline: 2px !important;
   }
 
   .ai-chat-toggle {
