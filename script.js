@@ -143,7 +143,9 @@ function initHeroCanvas() {
   const context = canvas.getContext("2d");
   if (!context) return;
 
-  const dots = Array.from({ length: 72 }, (_, index) => ({
+  const initialWidth = window.innerWidth || 1280;
+  const dotCount = initialWidth <= 480 ? 18 : initialWidth <= 768 ? 28 : 72;
+  const dots = Array.from({ length: dotCount }, (_, index) => ({
     x: Math.random(),
     y: Math.random(),
     z: Math.random() * 0.8 + 0.2,
