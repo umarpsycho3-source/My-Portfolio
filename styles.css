@@ -162,7 +162,7 @@ h3 {
 }
 .hero-content p:not(.eyebrow) { max-width: 700px; color: rgba(255,255,255,.78); font-size: clamp(1.05rem, 2vw, 1.28rem); }
 .hero-actions, .dialog-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
-.hero-actions {
+.hero .hero-actions {
   padding: 8px;
   border: 1px solid rgba(255,255,255,.15);
   border-radius: 16px;
@@ -257,6 +257,16 @@ h3 {
 .button.secondary:hover {
   border-color: #67e8f9;
   box-shadow: 0 0 0 2px rgba(103,232,249,.15), 0 10px 24px rgba(6,182,212,.22);
+}
+.project-card .hero-actions,
+.demo-offer-card .hero-actions,
+.table-actions {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  width: auto;
+  backdrop-filter: none;
 }
 .button {
   transform-style: preserve-3d;
