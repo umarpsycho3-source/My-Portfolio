@@ -18,6 +18,17 @@ const reviewsGrid = document.querySelector("#reviews-grid");
 const reviewForm = document.querySelector("#review-form");
 const reviewDialog = document.querySelector("#review-dialog");
 const adminReviewsTable = document.querySelector("#admin-reviews-table");
+const projectTotalCount = document.querySelector("#project-total-count");
+const marketPricingGrid = document.querySelector("#market-pricing-grid");
+const marketUpdatedAt = document.querySelector("#market-updated-at");
+const marketRate = document.querySelector("#market-rate");
+const marketSourceMode = document.querySelector("#market-source-mode");
+const aiChatToggle = document.querySelector("#ai-chat-toggle");
+const aiChatPanel = document.querySelector("#ai-chat-panel");
+const aiChatClose = document.querySelector("#ai-chat-close");
+const aiChatMessages = document.querySelector("#ai-chat-messages");
+const aiChatForm = document.querySelector("#ai-chat-form");
+const aiChatInput = document.querySelector("#ai-chat-input");
 
 let state = {
   projects: [],
@@ -234,6 +245,97 @@ function renderProjects() {
         )
         .join("")
     : `<p class="section-note">No projects found yet.</p>`;
+
+  if (projectTotalCount) projectTotalCount.textContent = String(state.projects.length);
+}
+
+function renderMarketRates(data) {
+  if (!marketPricingGrid) return;
+  const items = Array.isArray(data?.items) ? data.items : [];
+  marketPricingGrid.innerHTML = items.length
+    ? items
+        .map(
+          (item) => `
+        <article class="market-card reveal visible">
+          <h3>${escapeHtml(item.name)}</h3>
+          <p class="market-price">LKR ${Number(item.lkrPrice || 0).toLocaleString()}</p>
+          <p class="market-subprice">USD ${Number(item.usdPrice || 0).toFixed(2)} / ${escapeHtml(item.unit || "year")}</p>
+          <small>${escapeHtml(item.provider)}</small>
+        </article>`
+        )
+        .join("")
+    : `<p class="section-note">Could not load market rates right now.</p>`;
+
+  if (marketUpdatedAt && data?.updatedAt) {
+    marketUpdatedAt.textContent = `Updated: ${new Date(data.updatedAt).toLocaleString()}`;
+  }
+  if (marketRate && data?.usdToLkr) {
+    marketRate.textContent = `USD/LKR rate: ${Number(data.usdToLkr).toFixed(2)}`;
+  }
+  if (marketSourceMode) {
+    const mode = data?.sourceMode === "provider-config" ? "Provider live config" : "Market baseline + live FX";
+    marketSourceMode.textContent = `Source: ${mode}`;
+  }
+}
+
+async function loadMarketRates() {
+  try {
+    const data = await api("/api/market-rates");
+    renderMarketRates(data);
+  } catch (error) {
+    if (marketPricingGrid) {
+      marketPricingGrid.innerHTML = `<p class="section-note">Market pricing unavailable: ${escapeHtml(error.message)}</p>`;
+    }
+  }
+}
+
+function assistantReply(input) {
+  const text = String(input || "").toLowerCase();
+  if (text.includes("price") || text.includes("budget") || text.includes("cost")) {
+    return "Most projects start from Basic LKR 15,000, Standard LKR 35,000, and Premium LKR 75,000. Share your features and I can estimate your best-fit package.";
+  }
+  if (text.includes("time") || text.includes("delivery") || text.includes("timeline")) {
+    return "Typical delivery is 5 days (Basic), 14 days (Standard), and 30 days (Premium). Complex custom features can extend this slightly.";
+  }
+  if (text.includes("contact") || text.includes("whatsapp") || text.includes("email")) {
+    return "You can contact Umar via WhatsApp +94 77 181 3023 or email umarxgamer04@gmail.com. You can also submit the Hire form for a structured proposal.";
+  }
+  if (text.includes("project") || text.includes("start")) {
+    return "To start, pick a package, fill the Hire form with project type and features, and you will receive a response with next steps quickly.";
+  }
+  return "I can help with package selection, timeline, pricing, and project planning. Ask me what you want to build and I will guide you.";
+}
+
+function pushAssistantMessage(message, sender = "bot") {
+  if (!aiChatMessages) return;
+  const bubble = document.createElement("article");
+  bubble.className = `ai-message ${sender === "user" ? "ai-message-user" : "ai-message-bot"}`;
+  bubble.textContent = message;
+  aiChatMessages.appendChild(bubble);
+  aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+}
+
+function initAssistant() {
+  if (!aiChatToggle || !aiChatPanel) return;
+
+  const setOpen = (open) => {
+    aiChatPanel.classList.toggle("open", open);
+    aiChatPanel.setAttribute("aria-hidden", String(!open));
+    aiChatToggle.setAttribute("aria-expanded", String(open));
+  };
+
+  aiChatToggle.addEventListener("click", () => setOpen(!aiChatPanel.classList.contains("open")));
+  aiChatClose?.addEventListener("click", () => setOpen(false));
+
+  aiChatForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const text = aiChatInput?.value?.trim();
+    if (!text) return;
+    pushAssistantMessage(text, "user");
+    const reply = assistantReply(text);
+    window.setTimeout(() => pushAssistantMessage(reply, "bot"), 350);
+    aiChatForm.reset();
+  });
 }
 
 function renderReviews() {
@@ -594,8 +696,10 @@ async function init() {
   initHeroCanvas();
   initForms();
   initAdminActions();
+  initAssistant();
 
   await Promise.all([loadProjects(), loadReviews(), loadMe()]);
+  await loadMarketRates();
   await loadAdmin();
 }
 

@@ -102,7 +102,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&family=Space+Grotesk:wght@500;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -121,6 +121,7 @@
       <a href="#about">About</a>
       <a href="#skills">Skills</a>
       <a href="#pricing">Pricing</a>
+      <a href="#market-pricing">Hosting Rates</a>
       <a href="#reviews">Reviews</a>
       <a href="#work">Projects</a>
       <a href="#hire">Hire</a>
@@ -154,6 +155,27 @@
           <span>Free consultation</span>
         </div>
       </div>
+      <div class="hero-visual reveal" aria-hidden="true">
+        <div class="visual-monitor">
+          <div class="monitor-topbar"></div>
+          <div class="monitor-screen">
+            <div class="code-line w-70"></div>
+            <div class="code-line w-45"></div>
+            <div class="code-line w-85"></div>
+            <div class="code-line w-55"></div>
+          </div>
+        </div>
+        <div class="floating-panel panel-a">
+          <div class="dot-row"><span></span><span></span><span></span></div>
+          <div class="code-line w-80"></div>
+          <div class="code-line w-60"></div>
+        </div>
+        <div class="floating-panel panel-b">
+          <div class="dot-row"><span></span><span></span><span></span></div>
+          <div class="code-line w-65"></div>
+          <div class="code-line w-50"></div>
+        </div>
+      </div>
       <div class="hero-card profile-card reveal" id="profile-card">
         <div class="profile-orbit" aria-hidden="true"></div>
         <div class="profile-frame">
@@ -177,7 +199,7 @@
 
     <section class="metrics" aria-label="Portfolio highlights">
       <div><span>Focus</span><strong>Full-Stack</strong></div>
-      <div><span>Projects</span><strong>8+</strong></div>
+      <div><span>Projects</span><strong id="project-total-count">0</strong></div>
       <div><span>Location</span><strong>Kandy, Sri Lanka</strong></div>
       <div><span>Design</span><strong>Animation + 3D</strong></div>
     </section>
@@ -244,6 +266,21 @@
           <p>Works perfectly on all devices - desktop, tablet, and mobile.</p>
         </article>
       </div>
+    </section>
+    <section id="market-pricing" class="section market-pricing-section">
+      <div class="section-heading reveal">
+        <div>
+          <p class="eyebrow">Live Market</p>
+          <h2>Hosting and Domain Daily Rates</h2>
+        </div>
+        <p class="section-note">Prices update automatically using daily exchange-rate data. Final checkout prices can vary by registrar offers and taxes.</p>
+      </div>
+      <div class="market-meta reveal">
+        <span id="market-updated-at">Updated: checking...</span>
+        <span id="market-rate">USD/LKR rate: --</span>
+        <span id="market-source-mode">Source: checking...</span>
+      </div>
+      <div id="market-pricing-grid" class="market-pricing-grid"></div>
     </section>
     <section id="demo-offer" class="section demo-offer-section">
       <div class="demo-offer-card reveal">
@@ -611,7 +648,7 @@
   <footer class="site-footer">
     <span>Umar Portfolio</span>
     <span><a href="https://www.linkedin.com/in/mohamad-umar-suiiii7/" target="_blank" rel="noopener">LinkedIn</a> | <a
-        href="https://github.com/mohamad-umar-suiiii7" target="_blank" rel="noopener">GitHub</a></span>
+        href="https://github.com/umarpsycho3-source" target="_blank" rel="noopener">GitHub</a></span>
     <span>+94 77 181 3023 | umarxgamer04@gmail.com</span>
   </footer>
 
@@ -638,6 +675,20 @@
   <a class="floating-whatsapp" href="https://wa.me/94771813023?text=Hi%20Umar%2C%20I%20want%20to%20start%20a%20project." target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
     WhatsApp
   </a>
+  <button id="ai-chat-toggle" class="ai-chat-toggle" type="button" aria-expanded="false" aria-controls="ai-chat-panel">AI Assistant</button>
+  <aside id="ai-chat-panel" class="ai-chat-panel" aria-hidden="true">
+    <div class="ai-chat-header">
+      <strong>Umar AI Assistant</strong>
+      <button id="ai-chat-close" type="button" aria-label="Close AI Assistant">x</button>
+    </div>
+    <div id="ai-chat-messages" class="ai-chat-messages">
+      <article class="ai-message ai-message-bot">Hi, I can help you choose packages, estimate budget, and start your project quickly.</article>
+    </div>
+    <form id="ai-chat-form" class="ai-chat-form">
+      <input id="ai-chat-input" name="message" type="text" placeholder="Ask about pricing, timeline, or services..." required>
+      <button class="button primary" type="submit">Send</button>
+    </form>
+  </aside>
 
   <script type="module" src="script.js"></script>
 </body>

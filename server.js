@@ -225,6 +225,8 @@ let mongoClient = null;
 let mongoCollection = null;
 let useMongoStorage = false;
 let inMemoryDb = null;
+let marketCache = { updatedAt: null, usdToLkr: 325, items: [] };
+const PROVIDER_PRICE_CONFIG = process.env.PROVIDER_PRICE_CONFIG || "";
 
 function createInitialDb() {
   return {
@@ -239,7 +241,7 @@ function createInitialDb() {
 async function connectMongo() {
   if (!MONGODB_URI) return false;
   try {
-    mongoClient = new MongoClient(MONGODB_URI);
+    mongoClient = new MongoClient(MONGODB_URI, { serverSelectionTimeoutMS: 8000, connectTimeoutMS: 8000 });
     await mongoClient.connect();
     mongoCollection = mongoClient.db(MONGODB_DB_NAME).collection(MONGODB_COLLECTION);
     useMongoStorage = true;
@@ -252,6 +254,65 @@ async function connectMongo() {
     mongoCollection = null;
     return false;
   }
+}
+
+async function fetchUsdToLkrRate() {
+  try {
+    const response = await fetch("https://open.er-api.com/v6/latest/USD");
+    if (!response.ok) throw new Error(`Rate source returned ${response.status}`);
+    const payload = await response.json();
+    const rate = Number(payload?.rates?.LKR);
+    if (!Number.isFinite(rate) || rate <= 0) throw new Error("Invalid USD/LKR rate payload");
+    return rate;
+  } catch (error) {
+    return Number(marketCache.usdToLkr) || 325;
+  }
+}
+
+async function marketRates() {
+  const now = Date.now();
+  const stale = !marketCache.updatedAt || now - new Date(marketCache.updatedAt).getTime() > 1000 * 60 * 60 * 12;
+  if (!stale && marketCache.items.length) return marketCache;
+
+  const usdToLkr = await fetchUsdToLkrRate();
+  const baseline = [
+    { name: ".com Domain", usdPrice: 13.98, unit: "year", provider: "Namecheap/Porkbun market avg" },
+    { name: ".net Domain", usdPrice: 12.98, unit: "year", provider: "Namecheap/Porkbun market avg" },
+    { name: ".org Domain", usdPrice: 10.98, unit: "year", provider: "Namecheap/Porkbun market avg" },
+    { name: "Starter Shared Hosting", usdPrice: 3.99, unit: "month", provider: "Hostinger/Namecheap market avg" },
+    { name: "Business Hosting", usdPrice: 8.99, unit: "month", provider: "Hostinger market avg" },
+    { name: "VPS Hosting (entry)", usdPrice: 12.00, unit: "month", provider: "DigitalOcean/Hostinger market avg" },
+  ];
+  let source = baseline;
+  let sourceMode = "market-baseline";
+
+  if (PROVIDER_PRICE_CONFIG) {
+    try {
+      const parsed = JSON.parse(PROVIDER_PRICE_CONFIG);
+      if (Array.isArray(parsed) && parsed.length) {
+        source = parsed
+          .map((item) => ({
+            name: String(item.name || "").trim(),
+            usdPrice: Number(item.usdPrice || 0),
+            unit: String(item.unit || "year").trim(),
+            provider: String(item.provider || "custom-provider").trim(),
+          }))
+          .filter((item) => item.name && Number.isFinite(item.usdPrice) && item.usdPrice > 0);
+        if (source.length) sourceMode = "provider-config";
+      }
+    } catch (error) {
+      source = baseline;
+      sourceMode = "market-baseline";
+    }
+  }
+
+  marketCache = {
+    updatedAt: new Date().toISOString(),
+    usdToLkr,
+    sourceMode,
+    items: source.map((item) => ({ ...item, lkrPrice: Math.round(item.usdPrice * usdToLkr) })),
+  };
+  return marketCache;
 }
 
 async function ensureDb() {
@@ -603,6 +664,7 @@ async function handleApi(req, res, pathname) {
 
   if (req.method === "GET" && pathname === "/api/profile") return json(res, 200, { profile: profile() });
   if (req.method === "GET" && pathname === "/api/projects") return json(res, 200, { projects: db.projects });
+  if (req.method === "GET" && pathname === "/api/market-rates") return json(res, 200, await marketRates());
   if (req.method === "GET" && pathname === "/api/me") return json(res, 200, { user: publicUser(currentUser(req, db)) });
 
   if (req.method === "POST" && pathname === "/api/login") {
