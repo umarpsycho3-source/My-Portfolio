@@ -681,9 +681,47 @@ function assistantSystemPrompt(db) {
   ].join("\n");
 }
 
+function offlineAssistantReply(message, db) {
+  const text = String(message || "").trim();
+  const q = text.toLowerCase();
+  const projectCount = Array.isArray(db?.projects) ? db.projects.length : 0;
+
+  const askDetails = "Tell me 3 quick details: project type, deadline, and must-have features.";
+  const closeLead = "If you are ready, open the Hire section now. You can also message WhatsApp +94 77 181 3023.";
+
+  if (!text) return `Great to meet you. I can help you choose the best package, timeline, and budget. ${askDetails}`;
+
+  if (q.includes("portfolio")) {
+    return `For a portfolio website, Basic is usually best (LKR 15,000, about 5 days). If you need admin/blog/advanced animations, choose Standard (LKR 35,000, about 14 days). ${closeLead}`;
+  }
+  if (q.includes("ecommerce") || q.includes("shop") || q.includes("store")) {
+    return `For e-commerce, Standard is a strong start (catalog, forms, integrations). If you need payments, dashboards, and full custom logic, go Premium (LKR 75,000, about 30 days). ${askDetails}`;
+  }
+  if (q.includes("web app") || q.includes("dashboard") || q.includes("system")) {
+    return `For web apps/admin systems, Standard or Premium is recommended based on complexity. Standard fits core features; Premium fits advanced workflows and scaling. ${askDetails}`;
+  }
+  if (q.includes("price") || q.includes("pricing") || q.includes("budget") || q.includes("cost")) {
+    return "Packages: Basic LKR 15,000 (5 days), Standard LKR 35,000 (14 days), Premium LKR 75,000 (30 days). I can suggest the best package if you share your feature list.";
+  }
+  if (q.includes("time") || q.includes("delivery") || q.includes("deadline") || q.includes("timeline")) {
+    return "Delivery guide: Basic ~5 days, Standard ~14 days, Premium ~30 days. Timeline depends on feature count, content readiness, and revisions.";
+  }
+  if (q.includes("service") || q.includes("what do you do")) {
+    return `Services include business websites, portfolio sites, web apps, admin dashboards, UI/UX improvements, animation-rich frontend, and deployment support. Portfolio currently shows ${projectCount} projects.`;
+  }
+  if (q.includes("contact") || q.includes("whatsapp") || q.includes("email")) {
+    return "You can start quickly via Hire form, WhatsApp +94 77 181 3023, or email umarxgamer04@gmail.com.";
+  }
+  if (q.includes("motivate") || q.includes("confused") || q.includes("start")) {
+    return "You are closer than you think. Start with MVP features first, launch fast, then improve in phases. I can help you pick a package right now.";
+  }
+
+  return `I can guide you on freelancing services, package selection, pricing, and delivery planning. ${askDetails}`;
+}
+
 async function generateAssistantReply(message, db) {
   if (!OPENAI_API_KEY) {
-    return "AI assistant is almost ready. The site owner needs to add OPENAI_API_KEY in server environment variables to enable live AI replies.";
+    return offlineAssistantReply(message, db);
   }
 
   const input = String(message || "").trim();
@@ -734,7 +772,7 @@ async function handleApi(req, res, pathname) {
       return json(res, 200, { reply });
     } catch (error) {
       console.error("Assistant error:", error.message);
-      return error(res, 500, "Assistant unavailable right now. Please try again.");
+      return json(res, 200, { reply: offlineAssistantReply(message, db) });
     }
   }
 
