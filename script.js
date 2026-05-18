@@ -81,14 +81,19 @@ const trackEvent = (eventName, params = {}) => {
 function initHeader() {
   if (!header || !navToggle || !nav) return;
 
+  const setNavOpenState = (open) => {
+    nav.classList.toggle("open", open);
+    navToggle.setAttribute("aria-expanded", String(open));
+    document.body.classList.toggle("nav-open", open);
+  };
+
   const setHeaderState = () => header.classList.toggle("scrolled", window.scrollY > 20);
   setHeaderState();
   window.addEventListener("scroll", setHeaderState);
 
   const resetNavState = () => {
     if (window.innerWidth > 1180) {
-      nav.classList.remove("open");
-      navToggle.setAttribute("aria-expanded", "false");
+      setNavOpenState(false);
     }
   };
   window.addEventListener("resize", resetNavState);
@@ -96,13 +101,24 @@ function initHeader() {
 
   navToggle.addEventListener("click", () => {
     const open = nav.classList.toggle("open");
-    navToggle.setAttribute("aria-expanded", String(open));
+    setNavOpenState(open);
   });
 
   nav.addEventListener("click", (event) => {
-    if (event.target.closest("a")) {
-      nav.classList.remove("open");
-      navToggle.setAttribute("aria-expanded", "false");
+    if (event.target === nav || event.target.closest("a")) {
+      setNavOpenState(false);
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!document.body.classList.contains("nav-open")) return;
+    if (nav.contains(event.target) || navToggle.contains(event.target)) return;
+    setNavOpenState(false);
+  });
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      setNavOpenState(false);
     }
   });
 }
