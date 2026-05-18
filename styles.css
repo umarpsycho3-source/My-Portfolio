@@ -1404,3 +1404,65 @@ dialog p { color: var(--muted); }
     font-size: clamp(2rem, 11vw, 3.2rem);
   }
 }
+
+/* Phone-only alignment fixes (do not affect tablet/desktop) */
+@media (max-width: 640px) {
+  .hero.hero-premium {
+    overflow: hidden !important;
+  }
+
+  .hero-premium h1 {
+    max-width: 100% !important;
+    font-size: clamp(1.9rem, 10vw, 2.9rem) !important;
+    line-height: 1.05 !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+  }
+
+  .hero-premium .hero-content p,
+  .hero-premium .hero-rotating-line {
+    max-width: 100% !important;
+  }
+
+  .hero.hero-premium .hero-actions {
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+    padding: 8px !important;
+    gap: 8px !important;
+    overflow: hidden !important;
+  }
+
+  .hero.hero-premium .hero-actions .button {
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: .95rem !important;
+    white-space: normal !important;
+    text-align: center !important;
+    transform: none !important;
+  }
+
+  /* Disable magnetic/touch drift on mobile buttons */
+  .hero-premium .magnetic-btn {
+    transform: none !important;
+  }
+
+  .hero-premium .hero-stats {
+    margin-bottom: 120px !important;
+  }
+
+  .ai-chat-toggle {
+    bottom: 76px !important;
+    right: 10px !important;
+    min-height: 40px !important;
+    font-size: .82rem !important;
+    padding: 8px 11px !important;
+  }
+
+  .floating-whatsapp {
+    bottom: 18px !important;
+    right: 10px !important;
+    min-height: 40px !important;
+    font-size: .82rem !important;
+    padding: 8px 11px !important;
+  }
+}
