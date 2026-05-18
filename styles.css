@@ -1081,3 +1081,98 @@ dialog p { color: var(--muted); }
     font-size: .86rem;
   }
 }
+
+/* Final mobile lock: force clean single-column hero on phones */
+@media (max-width: 768px) {
+  .hero {
+    grid-template-columns: 1fr !important;
+    grid-template-areas: "copy" !important;
+    gap: 14px !important;
+    min-height: auto !important;
+    padding: 86px 14px 22px !important;
+    align-items: start !important;
+  }
+
+  .hero-content {
+    grid-area: copy !important;
+    order: 1 !important;
+    padding-top: 0 !important;
+    max-width: 100% !important;
+    z-index: 2 !important;
+  }
+
+  .hero-content h1 {
+    font-size: clamp(2rem, 10vw, 3.2rem) !important;
+    line-height: 1.06 !important;
+    margin-bottom: 10px !important;
+  }
+
+  .hero-content p:not(.eyebrow) {
+    font-size: 0.96rem !important;
+    line-height: 1.45 !important;
+    max-width: 100% !important;
+  }
+
+  .eyebrow {
+    font-size: 0.72rem !important;
+    line-height: 1.5 !important;
+    white-space: normal !important;
+    word-break: normal !important;
+  }
+
+  .hero-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+    margin-top: 16px !important;
+  }
+
+  .hero-actions .button {
+    width: 100% !important;
+    min-height: 44px !important;
+    font-size: 0.95rem !important;
+    padding: 10px 12px !important;
+  }
+
+  .hero-actions .cv-button {
+    grid-column: 1 / -1 !important;
+  }
+
+  .trust-badges {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+    margin-top: 14px !important;
+  }
+
+  .hero-insights {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+    margin-top: 12px !important;
+  }
+
+  /* Hide desktop-only decorative layers on phones */
+  .hero-visual,
+  .hero-card {
+    display: none !important;
+  }
+
+  /* Floating actions: keep compact and out of content flow */
+  .ai-chat-toggle {
+    right: 10px !important;
+    bottom: 72px !important;
+    min-height: 42px !important;
+    padding: 8px 12px !important;
+    font-size: 0.84rem !important;
+    z-index: 60 !important;
+  }
+
+  .floating-whatsapp {
+    right: 10px !important;
+    bottom: 16px !important;
+    min-height: 42px !important;
+    padding: 8px 12px !important;
+    font-size: 0.84rem !important;
+    z-index: 60 !important;
+  }
+}
