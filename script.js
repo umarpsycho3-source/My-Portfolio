@@ -100,7 +100,7 @@ function initHeader() {
   resetNavState();
 
   navToggle.addEventListener("click", () => {
-    const open = nav.classList.toggle("open");
+    const open = !nav.classList.contains("open");
     setNavOpenState(open);
   });
 
