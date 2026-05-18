@@ -86,6 +86,15 @@ textarea { resize: vertical; }
     radial-gradient(circle at 15% 75%, rgba(163, 230, 53, 0.18), transparent 30%),
     #070a12;
 }
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(120deg, rgba(34,211,238,.08), transparent 28%),
+    linear-gradient(300deg, rgba(192,132,252,.1), transparent 36%);
+}
 #hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
 .hero::after {
   content: "";
@@ -153,6 +162,14 @@ h3 {
 }
 .hero-content p:not(.eyebrow) { max-width: 700px; color: rgba(255,255,255,.78); font-size: clamp(1.05rem, 2vw, 1.28rem); }
 .hero-actions, .dialog-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.hero-actions {
+  padding: 8px;
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 16px;
+  background: rgba(9,14,26,.44);
+  width: fit-content;
+  backdrop-filter: blur(8px);
+}
 .trust-badges {
   display: flex;
   flex-wrap: wrap;
@@ -241,6 +258,12 @@ h3 {
   border-color: #67e8f9;
   box-shadow: 0 0 0 2px rgba(103,232,249,.15), 0 10px 24px rgba(6,182,212,.22);
 }
+.button {
+  transform-style: preserve-3d;
+}
+.button:active {
+  transform: translateY(1px) scale(.99);
+}
 .button.secondary.dark { color: var(--ink); border-color: var(--blue); }
 .button.danger { color: #fff; background: var(--rose); }
 .button.cv-button {
@@ -270,6 +293,9 @@ h3 {
   transform-style: preserve-3d;
   transform: perspective(1000px) rotateY(-10deg) rotateX(7deg);
   transition: transform .18s ease, box-shadow .18s ease;
+}
+.profile-card:hover {
+  box-shadow: 0 28px 70px rgba(0,0,0,.4), 0 0 0 1px rgba(103,232,249,.26);
 }
 .profile-card::before,
 .profile-card::after {
@@ -1086,7 +1112,9 @@ dialog p { color: var(--muted); }
 @media (max-width: 768px) {
   .hero {
     grid-template-columns: 1fr !important;
-    grid-template-areas: "copy" !important;
+    grid-template-areas:
+      "copy"
+      "profile" !important;
     gap: 14px !important;
     min-height: auto !important;
     padding: 86px 14px 22px !important;
@@ -1151,9 +1179,33 @@ dialog p { color: var(--muted); }
     margin-top: 12px !important;
   }
 
-  /* Hide desktop-only decorative layers on phones */
-  .hero-visual,
+  /* Keep coding visuals hidden, but show a clean mobile profile card */
+  .hero-visual {
+    display: none !important;
+  }
   .hero-card {
+    display: grid !important;
+    grid-area: profile !important;
+    order: 2 !important;
+    width: min(360px, 100%) !important;
+    margin: 6px auto 0 !important;
+    transform: none !important;
+    border-radius: 18px !important;
+    background: rgba(10,16,30,.68) !important;
+  }
+  .profile-frame {
+    transform: none !important;
+  }
+  .profile-card-body {
+    margin: -20px 10px 0 !important;
+    padding: 14px !important;
+    transform: none !important;
+    gap: 4px !important;
+  }
+  .profile-card-body strong {
+    font-size: 1.3rem !important;
+  }
+  .profile-chips {
     display: none !important;
   }
 
