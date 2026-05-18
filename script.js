@@ -29,6 +29,8 @@ const aiChatClose = document.querySelector("#ai-chat-close");
 const aiChatMessages = document.querySelector("#ai-chat-messages");
 const aiChatForm = document.querySelector("#ai-chat-form");
 const aiChatInput = document.querySelector("#ai-chat-input");
+const heroRotatingRole = document.querySelector("#hero-rotating-role");
+const heroProjectCount = document.querySelector("#hero-project-count");
 
 let state = {
   projects: [],
@@ -247,7 +249,46 @@ function renderProjects() {
     : `<p class="section-note">No projects found yet.</p>`;
 
   if (projectTotalCount) projectTotalCount.textContent = String(state.projects.length);
+  if (heroProjectCount) heroProjectCount.textContent = `${state.projects.length}+`;
   initInteractiveGlow();
+}
+
+function initPremiumHero() {
+  const hero = document.querySelector(".hero-premium");
+  const magneticButtons = document.querySelectorAll(".hero-premium .magnetic-btn");
+
+  if (hero) {
+    hero.addEventListener("pointermove", (event) => {
+      const rect = hero.getBoundingClientRect();
+      hero.style.setProperty("--mx", `${event.clientX - rect.left}px`);
+      hero.style.setProperty("--my", `${event.clientY - rect.top}px`);
+    });
+  }
+
+  const roles = ["Full-Stack Developer", "UI/UX Designer", "Software Engineer", "Web Architect", "AI Automation Builder"];
+  let roleIndex = 0;
+  if (heroRotatingRole) {
+    window.setInterval(() => {
+      roleIndex = (roleIndex + 1) % roles.length;
+      heroRotatingRole.style.opacity = "0";
+      window.setTimeout(() => {
+        heroRotatingRole.textContent = roles[roleIndex];
+        heroRotatingRole.style.opacity = "1";
+      }, 160);
+    }, 2200);
+  }
+
+  magneticButtons.forEach((button) => {
+    button.addEventListener("pointermove", (event) => {
+      const rect = button.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width - 0.5;
+      const y = (event.clientY - rect.top) / rect.height - 0.5;
+      button.style.transform = `translate(${x * 6}px, ${y * 4}px)`;
+    });
+    button.addEventListener("pointerleave", () => {
+      button.style.transform = "";
+    });
+  });
 }
 
 function initInteractiveGlow() {
@@ -734,6 +775,7 @@ async function init() {
   initAdminActions();
   initAssistant();
   initInteractiveGlow();
+  initPremiumHero();
 
   await Promise.all([loadProjects(), loadReviews(), loadMe()]);
   await loadMarketRates();
