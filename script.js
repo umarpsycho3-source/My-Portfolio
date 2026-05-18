@@ -247,6 +247,37 @@ function renderProjects() {
     : `<p class="section-note">No projects found yet.</p>`;
 
   if (projectTotalCount) projectTotalCount.textContent = String(state.projects.length);
+  initInteractiveGlow();
+}
+
+function initInteractiveGlow() {
+  const selectors = [
+    ".about-panel",
+    ".project-card",
+    ".pricing-card",
+    ".why-card",
+    ".review-card",
+    ".market-card",
+    ".demo-offer-card",
+    ".quick-contact-card",
+    ".table-card",
+    ".skill-card",
+  ];
+
+  const bindGlow = (element) => {
+    if (!element || element.dataset.glowBound === "1") return;
+    element.dataset.glowBound = "1";
+    element.classList.add("glow-box");
+    element.addEventListener("pointermove", (event) => {
+      const rect = element.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      element.style.setProperty("--mx", `${x}px`);
+      element.style.setProperty("--my", `${y}px`);
+    });
+  };
+
+  selectors.forEach((selector) => document.querySelectorAll(selector).forEach(bindGlow));
 }
 
 function renderMarketRates(data) {
@@ -276,6 +307,7 @@ function renderMarketRates(data) {
     const mode = data?.sourceMode === "provider-config" ? "Provider live config" : "Market baseline + live FX";
     marketSourceMode.textContent = `Source: ${mode}`;
   }
+  initInteractiveGlow();
 }
 
 async function loadMarketRates() {
@@ -360,6 +392,7 @@ function renderReviews() {
     : `<p class="section-note">No reviews yet. Be the first to leave a review.</p>`;
 
   updateReviewStats();
+  initInteractiveGlow();
 }
 
 function updateReviewStats() {
@@ -697,6 +730,7 @@ async function init() {
   initForms();
   initAdminActions();
   initAssistant();
+  initInteractiveGlow();
 
   await Promise.all([loadProjects(), loadReviews(), loadMe()]);
   await loadMarketRates();
