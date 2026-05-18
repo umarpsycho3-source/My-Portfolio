@@ -1846,3 +1846,285 @@ dialog p { color: var(--muted); }
     z-index: 70 !important;
   }
 }
+
+/* =========================================================
+   Responsive System Rebuild (mobile-first stability layer)
+   ========================================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+section {
+  width: 100%;
+  overflow: clip;
+}
+
+:root {
+  --page-pad: clamp(1rem, 3vw, 4rem);
+}
+
+.section {
+  padding-inline: var(--page-pad);
+}
+
+.hero,
+.hero.hero-premium,
+.site-header,
+.site-footer,
+.section-heading,
+.projects-grid,
+.skills-grid,
+.pricing-grid,
+.reviews-grid,
+.why-grid,
+.features-grid,
+.report-grid,
+.admin-layout,
+.hire-section {
+  min-width: 0;
+}
+
+.hero h1,
+.hero h2,
+.hero h3,
+.hero p,
+.site-nav a,
+.button {
+  word-break: break-word;
+}
+
+.hero.hero-premium .hero-content,
+.hero.hero-premium .hero-right,
+.hero.hero-premium .hero-actions,
+.hero.hero-premium .hero-stats,
+.hero.hero-premium .hero-tech-marquee,
+.hero.hero-premium .hero-tech-track,
+.hero.hero-premium .hero-card {
+  max-width: 100%;
+}
+
+.hero.hero-premium .hero-actions .button {
+  min-width: 0;
+}
+
+.projects-grid,
+.skills-grid,
+.pricing-grid,
+.reviews-grid,
+.why-grid {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.metrics {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.table-wrap {
+  max-width: 100%;
+}
+
+table {
+  max-width: 100%;
+}
+
+/* 1024 and below: collapse hero safely and prevent partial desktop break */
+@media (max-width: 1024px) {
+  .site-header {
+    padding-inline: clamp(12px, 2vw, 18px);
+  }
+
+  .hero.hero-premium {
+    grid-template-columns: 1fr !important;
+    grid-template-areas: "copy" "right" !important;
+    gap: 16px !important;
+    padding-top: 92px !important;
+  }
+
+  .hero.hero-premium .hero-right {
+    display: grid;
+    gap: 10px;
+  }
+
+  .hero.hero-premium .panel-a,
+  .hero.hero-premium .panel-b {
+    position: static !important;
+    width: 100% !important;
+    transform: none !important;
+  }
+
+  .hero.hero-premium .hero-card {
+    width: min(430px, 100%) !important;
+    margin-inline: auto;
+    transform: none !important;
+  }
+
+  .admin-layout,
+  .hire-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 768 and below: primary mobile layout */
+@media (max-width: 768px) {
+  .site-header {
+    padding: 12px 14px !important;
+  }
+
+  .site-nav {
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    max-height: min(72vh, 520px);
+    overflow: auto;
+  }
+
+  .hero.hero-premium {
+    padding: 84px 14px 136px !important;
+    gap: 14px !important;
+  }
+
+  .hero.hero-premium h1 {
+    font-size: clamp(2rem, 8vw, 3.2rem) !important;
+    line-height: 1.06 !important;
+  }
+
+  .hero.hero-premium .hero-rotating-line {
+    font-size: clamp(1rem, 3vw, 1.25rem) !important;
+  }
+
+  .hero.hero-premium .hero-content p:not(.eyebrow):not(.hero-rotating-line) {
+    font-size: clamp(0.95rem, 2vw, 1.1rem) !important;
+    line-height: 1.55 !important;
+  }
+
+  .hero.hero-premium .hero-actions {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+    width: 100% !important;
+    padding: 8px !important;
+  }
+
+  .hero.hero-premium .hero-actions .button {
+    width: 100% !important;
+    min-height: 48px !important;
+    padding: 11px 12px !important;
+    font-size: .95rem !important;
+  }
+
+  .hero.hero-premium .hero-actions .button::after {
+    display: none !important;
+  }
+
+  .hero-premium .hero-stats {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  .hero-premium .hero-stats article {
+    min-height: 84px !important;
+    padding: 12px !important;
+  }
+
+  .hero-premium .hero-tech-track {
+    animation-duration: 34s !important;
+  }
+
+  .hero-premium .magnetic-btn {
+    transform: none !important;
+  }
+
+  .projects-grid,
+  .skills-grid,
+  .pricing-grid,
+  .reviews-grid,
+  .why-grid,
+  .features-grid,
+  .report-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .section-heading {
+    align-items: start;
+  }
+
+  .site-footer {
+    display: grid;
+    gap: 8px;
+  }
+
+  .ai-chat-toggle,
+  .floating-whatsapp {
+    right: 10px !important;
+    min-height: 40px !important;
+    padding: 8px 11px !important;
+    font-size: .82rem !important;
+    z-index: 80 !important;
+  }
+
+  .ai-chat-toggle {
+    bottom: 70px !important;
+  }
+
+  .floating-whatsapp {
+    bottom: 16px !important;
+  }
+}
+
+/* 480 and below: compact phones */
+@media (max-width: 480px) {
+  .hero.hero-premium {
+    padding-inline: 12px !important;
+    padding-top: 80px !important;
+  }
+
+  .hero.hero-premium h1 {
+    font-size: clamp(1.8rem, 9vw, 2.6rem) !important;
+  }
+
+  .nav-toggle {
+    width: 48px;
+    height: 48px;
+  }
+
+  .button {
+    border-radius: 12px;
+  }
+}
+
+/* 320 and below: very small phones */
+@media (max-width: 320px) {
+  .hero.hero-premium {
+    padding-inline: 10px !important;
+  }
+
+  .hero.hero-premium h1 {
+    font-size: 1.65rem !important;
+  }
+
+  .hero.hero-premium .hero-actions .button {
+    font-size: .9rem !important;
+  }
+}
+
+/* 1440+: retain premium spacing on large screens */
+@media (min-width: 1440px) {
+  .hero.hero-premium {
+    padding-inline: clamp(2rem, 5vw, 6rem);
+  }
+}
