@@ -258,6 +258,7 @@ function renderProjects() {
 function initPremiumHero() {
   const hero = document.querySelector(".hero-premium");
   const magneticButtons = document.querySelectorAll(".hero-premium .magnetic-btn");
+  const isCompact = () => window.innerWidth <= 1024;
 
   if (hero) {
     hero.addEventListener("pointermove", (event) => {
@@ -282,6 +283,7 @@ function initPremiumHero() {
 
   magneticButtons.forEach((button) => {
     button.addEventListener("pointermove", (event) => {
+      if (isCompact()) return;
       const rect = button.getBoundingClientRect();
       const x = (event.clientX - rect.left) / rect.width - 0.5;
       const y = (event.clientY - rect.top) / rect.height - 0.5;
@@ -291,6 +293,15 @@ function initPremiumHero() {
       button.style.transform = "";
     });
   });
+
+  const clearMagneticOnResize = () => {
+    if (!isCompact()) return;
+    magneticButtons.forEach((button) => {
+      button.style.transform = "";
+    });
+  };
+  window.addEventListener("resize", clearMagneticOnResize);
+  clearMagneticOnResize();
 }
 
 function initInteractiveGlow() {
