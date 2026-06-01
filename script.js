@@ -293,7 +293,7 @@ function initPremiumHero() {
     });
   }
 
-  const roles = ["Full-Stack Developer", "UI/UX Designer", "Software Engineer", "Web Architect", "AI Automation Builder"];
+  const roles = ["UI/UX Designer", "Full-Stack Developer", "Interface Designer", "Web Experience Builder", "Creative Developer"];
   let roleIndex = 0;
   if (heroRotatingRole) {
     window.setInterval(() => {
@@ -816,7 +816,6 @@ async function init() {
   initPremiumHero();
 
   await Promise.all([loadProjects(), loadReviews(), loadMe()]);
-  await loadMarketRates();
   await loadAdmin();
 }
 
