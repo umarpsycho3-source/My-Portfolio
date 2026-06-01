@@ -3147,3 +3147,278 @@ textarea::placeholder {
     text-align: left;
   }
 }
+
+/* ===== POLISH FIXES: READABILITY, ADMIN, PROJECT ACTIONS ===== */
+.site-nav {
+  justify-content: center;
+}
+
+.site-nav a {
+  white-space: nowrap;
+}
+
+.hero-premium .hero-rotating-line {
+  min-height: 1.7em;
+}
+
+.section-heading,
+.about-title {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.2rem;
+  max-width: 1120px;
+  margin: 0 auto 2rem;
+}
+
+.section-heading > div,
+.about-title {
+  display: block;
+}
+
+.eyebrow,
+.section-heading .eyebrow,
+.about-title .eyebrow {
+  display: block;
+  margin: 0 0 0.45rem;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: clamp(0.82rem, 1.6vw, 0.98rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.section-heading h2,
+.about-panel h2,
+.about-title h2 {
+  display: block;
+  width: fit-content;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.62);
+  box-shadow: none;
+  font-size: clamp(2.15rem, 6vw, 4rem);
+  letter-spacing: -0.075em;
+  line-height: 0.98;
+}
+
+.section-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+  max-width: 520px;
+}
+
+.section-actions .section-note {
+  margin: 0;
+}
+
+.about-story > p {
+  padding: clamp(1.2rem, 2vw, 1.6rem);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 22px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025));
+  text-align: left;
+  text-decoration: none;
+  text-wrap: pretty;
+}
+
+.projects-grid {
+  align-items: stretch;
+}
+
+.project-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 420px;
+}
+
+.project-card img {
+  flex: 1 1 auto;
+  min-height: 250px;
+}
+
+.project-body {
+  position: static;
+  padding: 1.2rem;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.72));
+}
+
+.project-body p,
+.project-meta,
+.tag-row,
+.project-body .hero-actions {
+  display: flex;
+}
+
+.project-body p {
+  display: block;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.project-meta {
+  justify-content: space-between;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.tag-row {
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.project-body .hero-actions {
+  margin-top: 1rem;
+  gap: 0.6rem;
+}
+
+.project-body .button {
+  min-height: 42px;
+  padding: 0.65rem 1rem;
+}
+
+.skills-grid {
+  gap: 1rem;
+}
+
+.skill-card p {
+  overflow-wrap: normal;
+  word-break: normal;
+  text-wrap: pretty;
+  line-height: 1.5;
+}
+
+.hire-section {
+  grid-template-columns: minmax(280px, 0.85fr) minmax(320px, 1.15fr);
+  align-items: start;
+}
+
+.hire-copy,
+.hire-form {
+  min-width: 0;
+}
+
+.direct-contact {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.direct-contact a,
+.quick-contact-card a {
+  overflow-wrap: anywhere;
+}
+
+.admin-section {
+  color: #f8fafc;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(91, 188, 255, 0.18), transparent 28rem),
+    linear-gradient(180deg, #111112, #151518);
+}
+
+.admin-help {
+  max-width: 1120px;
+  margin: 0 auto 1.5rem;
+  padding: 1.2rem 1.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.admin-help strong {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: #fff;
+  font-size: 1.1rem;
+}
+
+.admin-help p {
+  margin: 0.2rem 0;
+}
+
+.admin-help a {
+  color: #8ed4ff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.login-form,
+.admin-form,
+.table-card,
+.admin-panel {
+  color: #f8fafc;
+}
+
+.login-form label,
+.admin-form label,
+.table-card,
+.admin-section th,
+.admin-section td {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.admin-section input,
+.admin-section textarea,
+.admin-section select {
+  color: #fff;
+  background: rgba(2, 6, 23, 0.78);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.site-footer {
+  padding-bottom: 2rem;
+}
+
+.footer-card {
+  grid-template-columns: minmax(180px, 0.9fr) minmax(160px, 0.7fr) minmax(160px, 0.7fr);
+  align-items: center;
+  min-height: auto;
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.footer-avatar img {
+  width: min(220px, 100%);
+  max-height: 240px;
+}
+
+.footer-card h3,
+.footer-card a {
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.footer-card small {
+  position: static;
+  border-top: 0;
+  padding-top: 0;
+}
+
+.footer-copy {
+  max-width: 980px;
+  margin: 0.85rem auto 0;
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 0.92rem;
+}
+
+@media (max-width: 900px) {
+  .section-heading,
+  .about-title {
+    display: block;
+  }
+
+  .section-actions {
+    justify-content: flex-start;
+    max-width: none;
+    margin-top: 1rem;
+  }
+
+  .project-card,
+  .project-card:nth-child(3) {
+    min-height: auto;
+  }
+
+  .hire-section {
+    grid-template-columns: 1fr;
+  }
+}

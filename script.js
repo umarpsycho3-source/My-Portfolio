@@ -266,8 +266,16 @@ function renderProjects() {
               ${(project.stack || []).map((item) => `<span class="tag">${escapeHtml(item)}</span>`).join("")}
             </div>
             <div class="hero-actions">
-              <a class="button secondary dark" href="${escapeHtml(project.liveUrl || "#")}" target="_blank" rel="noopener">Live</a>
-              <a class="button secondary dark" href="${escapeHtml(project.sourceUrl || "#")}" target="_blank" rel="noopener">Source</a>
+              ${
+                project.liveUrl && project.liveUrl !== "#"
+                  ? `<a class="button secondary dark" href="${escapeHtml(project.liveUrl)}" target="_blank" rel="noopener">Live Demo</a>`
+                  : ""
+              }
+              ${
+                project.sourceUrl && project.sourceUrl !== "#"
+                  ? `<a class="button secondary dark" href="${escapeHtml(project.sourceUrl)}" target="_blank" rel="noopener">Source</a>`
+                  : ""
+              }
             </div>
           </div>
         </article>`
@@ -293,9 +301,20 @@ function initPremiumHero() {
     });
   }
 
-  const roles = ["UI/UX Designer", "Full-Stack Developer", "Interface Designer", "Web Experience Builder", "Creative Developer"];
+  const roles = [
+    "Full-Stack Developer",
+    "Web Developer",
+    "Web Designer",
+    "Software Engineer",
+    "POS Solution Builder",
+    "Landing Page Designer",
+    "UI/UX Designer",
+    "Dashboard Developer",
+    "Business Website Developer",
+  ];
   let roleIndex = 0;
   if (heroRotatingRole) {
+    heroRotatingRole.textContent = roles[0];
     window.setInterval(() => {
       roleIndex = (roleIndex + 1) % roles.length;
       heroRotatingRole.style.opacity = "0";
